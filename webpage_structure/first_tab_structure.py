@@ -1,12 +1,16 @@
 import dash_core_components as dcc
 import dash_html_components as html
-import datetime as date
 
 from urllib.request import urlopen
 import json
 import pandas as pd
 import plotly.express as px
 from datetime import date
+import dash_table
+import numpy as np
+
+with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
+    counties = json.load(response)
 
 # dummy data for plotting
 us_cities = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/us-cities-top-1k.csv")
@@ -28,22 +32,36 @@ fig.update_layout(
     ])
 fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
+df = pd.DataFrame(np.zeros((20, 4)), columns=["Project", "Start", "End", "Capacity left"])
+
 
 def main_structure():
     return html.Div([
-        html.Div([html.Div(dcc.Graph(figure=fig),
-                           style={"width": "70%", "height": "99%", "border": "1px solid black", "float": "left"},
-                           className="one-third column",
-                           ),
-                  html.Div(id='output-container-date-picker-range',
-                           style={"width": "25%", "height": "99%", "border": "1px solid black", "float": "right"})],
-                 style={"width": "99%", "height": "80vh", "border": "1px solid black"}),
         html.Div([dcc.DatePickerRange(
             id='date-range-graphic',
             min_date_allowed=date(1995, 8, 5),
             max_date_allowed=date(2017, 9, 19),
             initial_visible_month=date(2017, 8, 5),
-            end_date=date(2017, 8, 25)
-        )],
-        ),
-    ])
+            start_date=date(2017, 7, 25),
+            end_date=date(2017, 8, 25),
+            style={"margin-left": "80px", "margin-top": "15px"}
+        )],style={"margin-left": "10px","margin-bottom":"10px"}),
+        html.Div(
+            [html.Div(dcc.Graph(figure=fig,style={'height': "75vh"}),
+                      style={"width": "70%", "height": "99%", "border": "1px solid black", "float": "left"},
+                      className="one-third column",
+                      ),
+             html.Div([html.Div(id='output-container-date-picker-range'),
+                       dash_table.DataTable(
+                           id='table',
+                           columns=[{"name": i, "id": i} for i in df.columns],
+                           data=df.to_dict('records'),
+                           style_header={'backgroundColor': 'rgb(30, 30, 30)'},
+                           style_cell={
+                                'backgroundColor': 'rgb(50, 50, 50)',
+                                'color': 'white'
+                           })
+                       ], style={"width": "25%", "height": "99%", "border": "1px solid black", "float": "right"})],
+            style={"width": "99%", "height": "80vh", "border": "1px solid black","margin-left":"10px"}),
+
+    ],style={"border": "1px solid black"})
