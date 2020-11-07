@@ -71,9 +71,11 @@ def conflict(column=0,starttime=date(2020, 7, 11),endtime=date(2025,7,11)):
             id='table_in_{}'.format(column),
             columns=[{"name": i, "id": i} for i in df_in.columns],
             data=df_in.to_dict('records')),
+        [
         dash_table.DataTable(
             id='table_focus_{}'.format(column),
             columns=[{"name": i, "id": i} for i in df_conflict.columns],
             data=df_conflict.to_dict('records'))
+        ]
     ])
 
