@@ -47,6 +47,16 @@ def update_output(start_date, end_date):
     else:
         return string_prefix
 
+@app.callback(dash.dependencies.Output('output-day-night', 'children'),
+              dash.dependencies.Input('day-night-select', 'value'))
+def select_time_of_day(value):
+    if value == 'Day':
+        return "You want them day"
+    elif value == 'Night':
+        return "You want them night"
+    else:
+        return "You want it all"
+
 # need vh for now later will scale to the size of the content
 if __name__ == '__main__':
     app.server.run(debug=True, threaded=True)
