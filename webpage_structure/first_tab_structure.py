@@ -41,7 +41,7 @@ fig.update_layout(
     ])
 fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
-troubleLoader.filter_by_time(date(2020, 7, 11),date(2021,7,11))
+troubleLoader.filter_by_time(date(2020, 7, 11),date(2022,7,11))
 df = troubleLoader.working_dataset.loc[:,["bp_to","bp_from","reduction_capacity","date_to","date_from"]]
 
 
@@ -69,7 +69,6 @@ def main_structure():
                       className="one-third column",
                       ),
              html.Div([html.Div(id='output-container-date-picker-range'),
-                       html.Div(id='output-day-night'),
                        dash_table.DataTable(
                            id='table',
                            columns=[{"name": i, "id": i} for i in df.columns],
@@ -78,7 +77,11 @@ def main_structure():
                            style_cell={
                                'backgroundColor': 'rgb(50, 50, 50)',
                                'color': 'white'
-                           })
+                           },
+                            style_table={
+                                'maxHeight': '75vh',
+                                'overflowY': 'scroll'
+                            })
                        ], style={"width": "25%", "height": "99%", "border": "1px solid black", "float": "right"})],
             style={"width": "99%", "height": "80vh", "border": "1px solid black", "margin-left": "10px"}),
 

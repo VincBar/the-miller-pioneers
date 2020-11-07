@@ -5,6 +5,7 @@ from dash.dependencies import Input, Output
 from webpage_structure import first_tab_structure as first
 from webpage_structure import second_tab_structure as second
 import pandas as pd
+import numpy as np
 from datetime import date
 from webpage_structure.first_tab_structure import troubleLoader
 
@@ -34,24 +35,27 @@ def render_content(tab):
 @app.callback(
     dash.dependencies.Output('table', 'data'),
     [dash.dependencies.Input('date-range-graphic', 'start_date'),
-     dash.dependencies.Input('date-range-graphic', 'end_date')])
-def update_output(start_date, end_date):
+     dash.dependencies.Input('date-range-graphic', 'end_date'),
+     dash.dependencies.Input('day-night-select', 'value')])
+def update_output(start_date, end_date,value):
     troubleLoader.filter_by_time(start_date, end_date)
-    df=troubleLoader.working_dataset.loc[:,["bp_to","bp_from","reduction_capacity","date_to","date_from"]]
+    if value == 'Day':
+        filter = np.logical_not(np.in1d(troubleLoader.working_dataset.loc[:, 'umsetzung_intervalltyp_umleitung'],["Sperre Bahnhof Nacht","Sperre Strecke Nacht"]))
+        df = troubleLoader.working_dataset.loc[
+            filter, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
+    elif value == 'Night':
+        filter = np.logical_not(np.in1d(troubleLoader.working_dataset.loc[:, 'umsetzung_intervalltyp_umleitung'],["Sperre Bahnhof Tag","Sperre Strecke Tag"]))
+        df = troubleLoader.working_dataset.loc[
+            filter, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
+    else:
+        df = troubleLoader.working_dataset.loc[
+            :, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
+
     df.loc[:, "date_to"] = pd.DatetimeIndex(df.loc[:, "date_to"]).strftime("%Y-%m-%d")
     df.loc[:, "date_from"] = pd.DatetimeIndex(df.loc[:, "date_from"]).strftime("%Y-%m-%d")
     return df.to_dict("records")
 
 
-@app.callback(dash.dependencies.Output('output-day-night', 'children'),
-              dash.dependencies.Input('day-night-select', 'value'))
-def select_time_of_day(value):
-    if value == 'Day':
-        return "You want them day"
-    elif value == 'Night':
-        return "You want them night"
-    else:
-        return "You want it all"
 
 
 # need vh for now later will scale to the size of the content
