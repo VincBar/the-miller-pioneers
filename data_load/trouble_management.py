@@ -32,7 +32,7 @@ class TroubleManager:
         self.filters_used["time"] = (start_time, end_time)
         self.working_dataset = self.working_dataset[
             (self.working_dataset["date_from"] >= pd.to_datetime(start_time, infer_datetime_format=True)) &
-            (self.working_dataset["date_from"] <= pd.to_datetime(end_time, infer_datetime_format=True))]
+            (self.working_dataset["date_to"] <= pd.to_datetime(end_time, infer_datetime_format=True))]
 
     def filter_by_line(self, line):
         if "line" in self.filters_used:
@@ -48,3 +48,27 @@ class TroubleManager:
         return_dataset["date_from"] = pd.DatetimeIndex(return_dataset.loc[:, "date_from"]).strftime("%Y-%m-%d")
         return_dataset["date_to"] = pd.DatetimeIndex(return_dataset.loc[:, "date_to"]).strftime("%Y-%m-%d")
         return return_dataset
+
+    def get_unassigned_constructions(self, start_time, end_time):
+        return self.constructions_dataset[
+            (self.constructions_dataset["date_from"] >= pd.to_datetime(start_time, infer_datetime_format=True)) &
+            (self.constructions_dataset["date_to"] <= pd.to_datetime(end_time, infer_datetime_format=True)) &
+            (self.constructions_dataset["reduction_capacity"].isna())]
+
+    def get_intersecting_constructions(self, construction):
+        return self.constructions_dataset[
+            ~((self.constructions_dataset["date_from"] >= pd.to_datetime(construction["date_to"],
+                                                                         infer_datetime_format=True))
+              | (self.constructions_dataset["date_to"] <= pd.to_datetime(construction["date_from"],
+                                                                         infer_datetime_format=True)))
+            & (self.constructions_dataset["reduction_capacity"].notna())
+            & ((self.constructions_dataset["bp_from"].isin([construction["bp_from"], construction["bp_to"]]))
+                | (self.constructions_dataset["bp_to"].isin([construction["bp_from"], construction["bp_to"]])))]
+
+    def get_conflicts_in_timeframe(self, start_time, end_time):
+        unassigned = self.get_unassigned_constructions(start_time, end_time)
+        result = []
+        for _, construction in unassigned.iterrows():
+            conflicts = self.get_intersecting_constructions(construction)
+            result.append((construction, conflicts))
+        return result
