@@ -14,7 +14,7 @@ class TroubleManager:
     def filter_by_time(self, start_time, end_time):
         self.working_dataset = self.constructions_dataset[
             (self.constructions_dataset["date_from"] >= pd.to_datetime(start_time, infer_datetime_format=True)) &
-            (self.constructions_dataset["date_from"] <= pd.to_datetime(start_time, infer_datetime_format=True))]
+            (self.constructions_dataset["date_from"] <= pd.to_datetime(end_time, infer_datetime_format=True))]
 
     def filter_by_line(self, line):
         points = self.operation_points_dataset["abkurzung_bpk"][self.operation_points_dataset["linie"] == line]
