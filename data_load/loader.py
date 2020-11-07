@@ -72,7 +72,7 @@ class ConstructionSiteLoader(DataLoader):
 class RoutesLoader(DataLoader):
     REQUEST_API = "https://data.sbb.ch/api/records/1.0/search/?dataset=zugzahlen"
     LOAD_FIELDS = {"strecke", "bp_von_abschnitt", "geschaeftscode", "bp_bis_abschnitt",
-                   "gesamtbelastung_bruttotonnen", "tu_nummer"}
+                   "gesamtbelastung_bruttotonnen", "anzahl_zuege"}
 
     params = {"rows": str(-1)}
 
@@ -80,6 +80,6 @@ class RoutesLoader(DataLoader):
         df = super().load()
         df["geschaeftscode"] = (df["geschaeftscode"] == "PERSONENVERKEHR")
         df = df.rename(columns={"geschaeftscode": "is_passenger", "gesamtbelastung_bruttotonnen": "size", "in_richtung": "direction",
-                                "tu_nummer": "num_trains", "bp_von_abschnitt": "bp_from", "bp_bis_abschnitt": "bp_to"})
+                                "anzahl_zuege": "num_trains", "bp_von_abschnitt": "bp_from", "bp_bis_abschnitt": "bp_to"})
 
         return df
