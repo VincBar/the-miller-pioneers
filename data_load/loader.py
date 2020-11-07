@@ -41,7 +41,7 @@ class DataLoader:
 
 class LineLoader(DataLoader):
     REQUEST_API = "https://data.sbb.ch/api/records/1.0/search/?dataset=linie-mit-betriebspunkten"
-    LOAD_FIELDS = {"linie", "km", 'abkurzung_bpk', 'abkurzung_bps'}
+    LOAD_FIELDS = {"linie", "km", 'abkurzung_bpk'}
 
     params = {"rows": str(-1), "facet": "linie"}
 
@@ -55,7 +55,8 @@ class LineLoader(DataLoader):
 
 class ConstructionSiteLoader(DataLoader):
     REQUEST_API = "https://data.sbb.ch/api/records/1.0/search/?dataset=construction-site"
-    LOAD_FIELDS = {"bp_from", "bp_to", 'region', 'reduction_capacity', "umsetzung_intervalltyp_umleitung"}
+    LOAD_FIELDS = {"bp_from", "bp_to", 'region', 'reduction_capacity',
+                   "umsetzung_intervalltyp_umleitung", "date_from", "date_to"}
 
     params = {"rows": str(-1), "facet": "region"}
 
