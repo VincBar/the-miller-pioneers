@@ -17,11 +17,11 @@ class DataLoader:
     def get_data_from_fields(self, fields):
         res = {}
         for k, v in fields:
-            if k == "geopos":
-                res["latitude"], res["longitude"] = lat_long_from_geopos(v)
-            elif k in self.LOAD_FIELDS:
-                res[k] = v
-
+            if k in self.LOAD_FIELDS:
+                if k == "geopos":
+                    res["latitude"], res["longitude"] = lat_long_from_geopos(v)
+                else:
+                    res[k] = v
         return res
 
     def set_sort(self, param):
@@ -67,3 +67,10 @@ class ConstructionSiteLoader(DataLoader):
     def filter_region(self, region):
         self.params["refine.region"] = str(region)
         return self
+
+
+class RoutesLoader(DataLoader):
+    REQUEST_API = "https://data.sbb.ch/api/records/1.0/search/?dataset=zugzahlen"
+    LOAD_FIELDS = {"BP_Von_Abschnitt", "BP_Bis_Abschnitt", "Geschaeftscode", "Gesamtbelastung_Bruttotonnen"}
+
+    params = {"rows": str(-1)}
