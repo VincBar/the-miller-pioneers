@@ -5,6 +5,8 @@ from dash.dependencies import Input, Output
 from webpage_structure import first_tab_structure as first
 from webpage_structure import second_tab_structure as second
 from datetime import date
+from webpage_structure.first_tab_structure import troubleLoader
+
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__)
@@ -29,23 +31,13 @@ def render_content(tab):
 
 
 @app.callback(
-    dash.dependencies.Output('output-container-date-picker-range', 'children'),
+    dash.dependencies.Output('table', 'data'),
     [dash.dependencies.Input('date-range-graphic', 'start_date'),
      dash.dependencies.Input('date-range-graphic', 'end_date')])
 def update_output(start_date, end_date):
-    string_prefix = 'You have selected: '
-    if start_date is not None:
-        start_date_object = date.fromisoformat(start_date)
-        start_date_string = start_date_object.strftime('%B %d, %Y')
-        string_prefix = string_prefix + 'Start Date: ' + start_date_string + ' | '
-    if end_date is not None:
-        end_date_object = date.fromisoformat(end_date)
-        end_date_string = end_date_object.strftime('%B %d, %Y')
-        string_prefix = string_prefix + 'End Date: ' + end_date_string
-    if len(string_prefix) == len('You have selected: '):
-        return 'Select a date to see it displayed here'
-    else:
-        return string_prefix
+    troubleLoader.filter_by_time(start_date, end_date)
+    return troubleLoader.working_dataset.loc[:, ["bp_to", "bp_from", "reduction_capacity"]].to_dict("records")
+
 
 @app.callback(dash.dependencies.Output('output-day-night', 'children'),
               dash.dependencies.Input('day-night-select', 'value'))
@@ -56,6 +48,7 @@ def select_time_of_day(value):
         return "You want them night"
     else:
         return "You want it all"
+
 
 # need vh for now later will scale to the size of the content
 if __name__ == '__main__':

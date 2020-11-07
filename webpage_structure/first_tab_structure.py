@@ -2,20 +2,28 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 from urllib.request import urlopen
+
 import json
 import pandas as pd
 import plotly.express as px
 from datetime import date
 import dash_table
 import numpy as np
+from data_load.loader import LineLoader, ConstructionSiteLoader
+from data_load.trouble_management import TroubleManager
 
 with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
     counties = json.load(response)
+
+line_data = LineLoader().load()
+construction_data = ConstructionSiteLoader().load()
+troubleLoader = TroubleManager(construction_data, line_data)
 
 # dummy data for plotting
 us_cities = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/us-cities-top-1k.csv")
 fig = px.scatter_mapbox(us_cities, lat="lat", lon="lon", hover_name="City", hover_data=["State", "Population"],
                         color_discrete_sequence=["fuchsia"])
+
 fig.update_layout(
     mapbox_zoom=6,  # hardcoded values for center of switzerland, can be adjusted automagically when we have the data
     mapbox_center_lat=46.87,
@@ -32,7 +40,8 @@ fig.update_layout(
     ])
 fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
-df = pd.DataFrame(np.zeros((20, 4)), columns=["Project", "Start", "End", "Capacity left"])
+troubleLoader.filter_by_time(date(2020, 7, 11),date(2021,7,11))
+df = troubleLoader.working_dataset.loc[:,["bp_to","bp_from","reduction_capacity"]]
 
 
 def main_structure():
@@ -40,11 +49,11 @@ def main_structure():
         html.Div([
             dcc.DatePickerRange(
                 id='date-range-graphic',
-                min_date_allowed=date(1995, 8, 5),
-                max_date_allowed=date(2017, 9, 19),
-                initial_visible_month=date(2017, 8, 5),
-                start_date=date(2017, 7, 25),
-                end_date=date(2017, 8, 25),
+                min_date_allowed=date(2020, 7, 11),
+                max_date_allowed=date(2050, 7, 11),
+                initial_visible_month=date(2020, 7, 11),
+                start_date=date(2020, 7, 11),
+                end_date=date(2021, 7, 11),
                 style={"margin-left": "80px", "margin-top": "15px", "margin-bottom": "4px", 'float': 'left'}
             ), dcc.RadioItems(
                 id='day-night-select',
