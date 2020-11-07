@@ -75,7 +75,7 @@ def content_update(ordering_selection):
     if ordering_selection == "time":
         return second.severe(column=0), second.severe(column=1), second.severe(column=2)
     if ordering_selection == "conflict":
-        return second.severe(column=0), second.severe(column=1), second.severe(column=2)
+        return second.conflict(column=0), second.conflict(column=1), second.conflict(column=2)
 
 
 # need vh for now later will scale to the size of the content

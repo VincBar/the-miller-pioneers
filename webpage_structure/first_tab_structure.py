@@ -45,7 +45,6 @@ troubleLoader.filter_by_time(date(2020, 7, 11),date(2025,7,11))
 df = troubleLoader.working_dataset.loc[:,["bp_to","bp_from","reduction_capacity","date_to","date_from"]]
 
 
-
 def main_structure():
     return html.Div([
         html.Div([

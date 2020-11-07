@@ -3,6 +3,7 @@ import dash_html_components as html
 from datetime import date
 import dash_table
 import pandas as pd
+from webpage_structure.first_tab_structure import troubleLoader
 
 def main_structure():
     return html.Div([
@@ -59,5 +60,20 @@ def severe(column=0):
             id='table_focus_{}'.format(column),
             columns=[{"name": i, "id": i} for i in df.columns],
             data=df.to_dict('records'))
+    ])
+
+def conflict(column=0,starttime=date(2020, 7, 11),endtime=date(2025,7,11)):
+    df_in = pd.DataFrame(troubleLoader.get_conflicts_in_timeframe(date(2020, 7, 11),date(2025,7,11))[column][0])
+    df_conflict = pd.DataFrame(troubleLoader.get_conflicts_in_timeframe(date(2020, 7, 11),date(2025,7,11))[column][1]).transpose()
+
+    return html.Div([
+        dash_table.DataTable(
+            id='table_in_{}'.format(column),
+            columns=[{"name": i, "id": i} for i in df_in.columns],
+            data=df_in.to_dict('records')),
+        dash_table.DataTable(
+            id='table_focus_{}'.format(column),
+            columns=[{"name": i, "id": i} for i in df_conflict.columns],
+            data=df_conflict.to_dict('records'))
     ])
 
