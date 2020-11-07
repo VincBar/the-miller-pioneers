@@ -4,6 +4,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 from webpage_structure import first_tab_structure as first
 from webpage_structure import second_tab_structure as second
+import pandas as pd
 from datetime import date
 from webpage_structure.first_tab_structure import troubleLoader
 
@@ -29,14 +30,17 @@ def render_content(tab):
     elif tab == 'tab-2':
         return second.main_structure()
 
-
+#
 @app.callback(
     dash.dependencies.Output('table', 'data'),
     [dash.dependencies.Input('date-range-graphic', 'start_date'),
      dash.dependencies.Input('date-range-graphic', 'end_date')])
 def update_output(start_date, end_date):
     troubleLoader.filter_by_time(start_date, end_date)
-    return troubleLoader.working_dataset.loc[:, ["bp_to", "bp_from", "reduction_capacity"]].to_dict("records")
+    df=troubleLoader.working_dataset.loc[:,["bp_to","bp_from","reduction_capacity","date_to","date_from"]]
+    df.loc[:, "date_to"] = pd.DatetimeIndex(df.loc[:, "date_to"]).strftime("%Y-%m-%d")
+    df.loc[:, "date_from"] = pd.DatetimeIndex(df.loc[:, "date_from"]).strftime("%Y-%m-%d")
+    return df.to_dict("records")
 
 
 @app.callback(dash.dependencies.Output('output-day-night', 'children'),

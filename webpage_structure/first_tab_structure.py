@@ -24,6 +24,7 @@ us_cities = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/maste
 fig = px.scatter_mapbox(us_cities, lat="lat", lon="lon", hover_name="City", hover_data=["State", "Population"],
                         color_discrete_sequence=["fuchsia"])
 
+
 fig.update_layout(
     mapbox_zoom=6,  # hardcoded values for center of switzerland, can be adjusted automagically when we have the data
     mapbox_center_lat=46.87,
@@ -41,7 +42,7 @@ fig.update_layout(
 fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
 troubleLoader.filter_by_time(date(2020, 7, 11),date(2021,7,11))
-df = troubleLoader.working_dataset.loc[:,["bp_to","bp_from","reduction_capacity"]]
+df = troubleLoader.working_dataset.loc[:,["bp_to","bp_from","reduction_capacity","date_to","date_from"]]
 
 
 def main_structure():
