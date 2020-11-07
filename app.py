@@ -1,4 +1,4 @@
-import dash
+import dash, json
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
@@ -31,6 +31,11 @@ def render_content(tab):
     elif tab == 'tab-2':
         return second.main_structure()
 
+@app.callback(
+    Output('output-point-click', 'children'),
+    [Input('basic-map', 'clickData')])
+def display_click_data(clickData):
+    return json.dumps(clickData, indent=2)
 
 #
 @app.callback(

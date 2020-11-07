@@ -9,20 +9,34 @@ import plotly.express as px
 from datetime import date
 import dash_table
 import numpy as np
+import plotly.graph_objects as go
+from data_load.utils import line_info
+from data_load.loader import BigLineLoader
 from data_load.loader import LineLoader, ConstructionSiteLoader
 from data_load.trouble_management import TroubleManager
 
-with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
-    counties = json.load(response)
+d = BigLineLoader().set_sort_km().load()
+d = d.rename(columns={'latitude': 'lat', 'longitude': 'lon'})
+d['line_group'] = d['linie']
+d['mode'] = ['markers+lines'] * len(d)
+print(d)
+
+fig = px.line_mapbox(d, lat="lat", lon="lon", hover_name="bezeichnung_bps", hover_data=["linienname", "linie"],
+                        line_group='line_group', color='line_group')
+
+'''
+for i, line in enumerate(line_info(d)):
+    line_dict = dict(mode="markers+lines",
+                     lon=line['lon'],
+                     lat=line['lat'],
+                     marker={'size': 10})
+    if len(line['lon']) > 2:
+        fig.add_trace(**line_dict) #go.Scattermapbox(**line_dict))
+'''
 
 line_data = LineLoader().load()
 construction_data = ConstructionSiteLoader().load()
 troubleLoader = TroubleManager(construction_data, line_data)
-
-# dummy data for plotting
-us_cities = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/us-cities-top-1k.csv")
-fig = px.scatter_mapbox(us_cities, lat="lat", lon="lon", hover_name="City", hover_data=["State", "Population"],
-                        color_discrete_sequence=["fuchsia"])
 
 
 fig.update_layout(
@@ -64,11 +78,12 @@ def main_structure():
                 style={"margin-left": "20px", "margin-top": "19px", 'float': 'left'}
             )], style={"margin-left": "10px", "margin-bottom": "10px", "display": "table-row"}),
         html.Div(
-            [html.Div(dcc.Graph(figure=fig, style={'height': "75vh"}),
+            [html.Div(dcc.Graph(id='basic-map',figure=fig, style={'height': "75vh"}),
                       style={"width": "70%", "height": "99%", "border": "1px solid black", "float": "left"},
                       className="one-third column",
                       ),
              html.Div([html.Div(id='output-container-date-picker-range'),
+                       html.Div(id='output-point-click'),
                        dash_table.DataTable(
                            id='table',
                            columns=[{"name": i, "id": i} for i in df.columns],
