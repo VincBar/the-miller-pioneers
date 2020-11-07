@@ -8,37 +8,61 @@ def lat_long_from_geopos(geopos):
     return lat, lon
 
 
-class LineLoader:
-    REQUEST_API = "https://data.sbb.ch/api/records/1.0/search/?dataset=linie-mit-betriebspunkten"
-    LOAD_FIELDS = {"linie", "km", 'abkurzung_bpk', 'abkurzung_bps'}
+class DataLoader:
+    REQUEST_API = None
+    LOAD_FIELDS = None
 
-    params = {"rows": str(-1), "facet": "linie"}
+    params = {"rows": str(-1)}
 
-    @staticmethod
-    def get_data_from_fields(fields):
+    def get_data_from_fields(self, fields):
         res = {}
         for k, v in fields:
             if k == "geopos":
                 res["latitude"], res["longitude"] = lat_long_from_geopos(v)
-            elif k in LineLoader.LOAD_FIELDS:
+            elif k in self.LOAD_FIELDS:
                 res[k] = v
 
         return res
 
-    def set_sort_lines(self):
-        self.params["sort"] = "-linie"
+    def set_sort(self, param):
+        self.params["sort"] = "-{}".format(param)
         return self
 
     def set_n(self, n):
         self.params["rows"] = str(n)
         return self
 
+    def load(self):
+        r = requests.get(self.REQUEST_API, params=self.params)
+        data = r.json()["records"]
+        data_list = [self.get_data_from_fields(d["fields"].items()) for d in data]
+        return pd.DataFrame(data_list)
+
+
+class LineLoader(DataLoader):
+    REQUEST_API = "https://data.sbb.ch/api/records/1.0/search/?dataset=linie-mit-betriebspunkten"
+    LOAD_FIELDS = {"linie", "km", 'abkurzung_bpk', 'abkurzung_bps'}
+
+    params = {"rows": str(-1), "facet": "linie"}
+
+    def set_sort_lines(self):
+        return self.set_sort("linie")
+
     def filter_line(self, line):
         self.params["refine.linie"] = str(line)
         return self
 
-    def load(self):
-        r = requests.get(LineLoader.REQUEST_API, params=self.params)
-        data = r.json()["records"]
-        data_list = [LineLoader.get_data_from_fields(d["fields"].items()) for d in data]
-        return pd.DataFrame(data_list)
+
+class ConstructionSiteLoader(DataLoader):
+    REQUEST_API = "https://data.sbb.ch/api/records/1.0/search/?dataset=construction-site"
+    LOAD_FIELDS = {"bp_from", "bp_to", 'region', 'reduction_capacity', "umsetzung_intervalltyp_umleitung"}
+
+    params = {"rows": str(-1), "facet": "region"}
+
+    def set_sort_start_time(self):
+        self.params["sort"] = "-date_from"
+        return self
+
+    def filter_region(self, region):
+        self.params["refine.region"] = str(region)
+        return self
