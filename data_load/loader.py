@@ -53,6 +53,13 @@ class LineLoader(DataLoader):
         return self
 
 
+class BigLineLoader(LineLoader):
+    LOAD_FIELDS = {"linie", "km", 'abkurzung_bpk', 'abkurzung_bps', 'linienname', "bezeichnung_bps", "geopos"}
+    def set_sort_km(self):
+        return self.set_sort("km")
+
+
+
 class ConstructionSiteLoader(DataLoader):
     REQUEST_API = "https://data.sbb.ch/api/records/1.0/search/?dataset=construction-site"
     LOAD_FIELDS = {"bp_from", "bp_to", 'region', 'reduction_capacity',

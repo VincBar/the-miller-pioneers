@@ -1,4 +1,4 @@
-import dash
+import dash, json
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
@@ -27,7 +27,6 @@ def render_content(tab):
     elif tab == 'tab-2':
         return second.main_structure()
 
-
 @app.callback(
     dash.dependencies.Output('output-container-date-picker-range', 'children'),
     [dash.dependencies.Input('date-range-graphic', 'start_date'),
@@ -46,6 +45,14 @@ def update_output(start_date, end_date):
         return 'Select a date to see it displayed here'
     else:
         return string_prefix
+
+
+@app.callback(
+    Output('output-point-click', 'children'),
+    [Input('basic-map', 'clickData')])
+def display_click_data(clickData):
+    return json.dumps(clickData, indent=2)
+
 
 @app.callback(dash.dependencies.Output('output-day-night', 'children'),
               dash.dependencies.Input('day-night-select', 'value'))
