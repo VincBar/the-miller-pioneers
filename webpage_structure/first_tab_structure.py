@@ -55,9 +55,9 @@ fig.update_layout(
     ])
 fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
-
-troubleLoader.filter_by_time(date(2020, 7, 11),date(2022,7,11))
+troubleLoader.filter_by_time(date(2020, 7, 11),date(2025,7,11))
 df = troubleLoader.working_dataset.loc[:,["bp_to","bp_from","reduction_capacity","date_to","date_from"]]
+
 
 
 def main_structure():

@@ -14,7 +14,7 @@ from webpage_structure.first_tab_structure import troubleLoader
 app = dash.Dash(__name__)
 server = app.server
 app.layout = html.Div([
-    dcc.Tabs(id='tabs-example', value='tab-1', children=[
+    dcc.Tabs(id='tabs-example', value='tab-2', children=[
         dcc.Tab(label='Switzerland Overview', value='tab-1'),
         dcc.Tab(label='Trouble Analysis', value='tab-2'),
     ]),
@@ -43,25 +43,44 @@ def display_click_data(clickData):
     [dash.dependencies.Input('date-range-graphic', 'start_date'),
      dash.dependencies.Input('date-range-graphic', 'end_date'),
      dash.dependencies.Input('day-night-select', 'value')])
-def update_output(start_date, end_date,value):
+def update_output(start_date, end_date, value):
     troubleLoader.filter_by_time(start_date, end_date)
     if value == 'Day':
-        filter = np.logical_not(np.in1d(troubleLoader.working_dataset.loc[:, 'umsetzung_intervalltyp_umleitung'],["Sperre Bahnhof Nacht","Sperre Strecke Nacht"]))
+        filter = np.logical_not(np.in1d(troubleLoader.working_dataset.loc[:, 'umsetzung_intervalltyp_umleitung'],
+                                        ["Sperre Bahnhof Nacht", "Sperre Strecke Nacht"]))
         df = troubleLoader.working_dataset.loc[
             filter, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
     elif value == 'Night':
-        filter = np.logical_not(np.in1d(troubleLoader.working_dataset.loc[:, 'umsetzung_intervalltyp_umleitung'],["Sperre Bahnhof Tag","Sperre Strecke Tag"]))
+        filter = np.logical_not(np.in1d(troubleLoader.working_dataset.loc[:, 'umsetzung_intervalltyp_umleitung'],
+                                        ["Sperre Bahnhof Tag", "Sperre Strecke Tag"]))
         df = troubleLoader.working_dataset.loc[
             filter, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
     else:
         df = troubleLoader.working_dataset.loc[
-            :, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
+             :, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
 
     df.loc[:, "date_to"] = pd.DatetimeIndex(df.loc[:, "date_to"]).strftime("%Y-%m-%d")
     df.loc[:, "date_from"] = pd.DatetimeIndex(df.loc[:, "date_from"]).strftime("%Y-%m-%d")
     return df.to_dict("records")
 
 
+@app.callback(
+    [dash.dependencies.Output('first_column', 'children'),
+    dash.dependencies.Output('second_column', 'children'),
+    dash.dependencies.Output('third_column', 'children')],
+    [dash.dependencies.Input('ordering-selection', 'value')]
+)
+def content_update(ordering_selection):
+    if ordering_selection == "severe":
+        return second.severe(column=0), second.severe(column=1), second.severe(column=2)
+    if ordering_selection == "normal":
+        return second.severe(column=0), second.severe(column=1), second.severe(column=2)
+    if ordering_selection == "capcity":
+        return second.severe(column=0), second.severe(column=1), second.severe(column=2)
+    if ordering_selection == "time":
+        return second.severe(column=0), second.severe(column=1), second.severe(column=2)
+    if ordering_selection == "conflict":
+        return second.severe(column=0), second.severe(column=1), second.severe(column=2)
 
 
 # need vh for now later will scale to the size of the content
