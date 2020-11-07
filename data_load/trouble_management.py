@@ -71,4 +71,5 @@ class TroubleManager:
         for _, construction in unassigned.iterrows():
             conflicts = self.get_intersecting_constructions(construction)
             result.append((construction, conflicts))
+        result.sort(key=lambda x: len(x[1]))
         return result
