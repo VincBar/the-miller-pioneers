@@ -8,11 +8,11 @@ def main_structure():
         html.Div([
             dcc.DatePickerRange(
                 id='date-range-trouble',
-                min_date_allowed=date(1995, 8, 5),
-                max_date_allowed=date(2017, 9, 19),
-                initial_visible_month=date(2017, 8, 5),
-                start_date=date(2017, 7, 25),
-                end_date=date(2017, 8, 25),
+                min_date_allowed=date(2020, 7, 11),
+                max_date_allowed=date(2050, 7, 11),
+                initial_visible_month=date(2020, 7, 11),
+                start_date=date(2020, 7, 11),
+                end_date=date(2021, 7, 11),
                 style={"margin-left": "80px", "margin-top": "15px", "margin-bottom": "4px", 'float': 'left'}
             ),
             dcc.Dropdown(

@@ -2,6 +2,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 from urllib.request import urlopen
+
 import json
 import pandas as pd
 import plotly.express as px
@@ -11,6 +12,8 @@ import numpy as np
 import plotly.graph_objects as go
 from data_load.utils import line_info
 from data_load.loader import BigLineLoader
+from data_load.loader import LineLoader, ConstructionSiteLoader
+from data_load.trouble_management import TroubleManager
 
 d = BigLineLoader().set_sort_km().load()
 d = d.rename(columns={'latitude': 'lat', 'longitude': 'lon'})
@@ -31,6 +34,11 @@ for i, line in enumerate(line_info(d)):
         fig.add_trace(**line_dict) #go.Scattermapbox(**line_dict))
 '''
 
+line_data = LineLoader().load()
+construction_data = ConstructionSiteLoader().load()
+troubleLoader = TroubleManager(construction_data, line_data)
+
+
 fig.update_layout(
     mapbox_zoom=6,  # hardcoded values for center of switzerland, can be adjusted automagically when we have the data
     mapbox_center_lat=46.87,
@@ -48,14 +56,8 @@ fig.update_layout(
 fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
 
-df = pd.DataFrame({
-    "x": [1,2,1,2],
-    "y": [1,2,3,4],
-    "customdata": [1,2,3,4],
-    "fruit": ["apple", "apple", "orange", "orange"]
-})
-
-df = pd.DataFrame(np.zeros((20, 4)), columns=["Project", "Start", "End", "Capacity left"])
+troubleLoader.filter_by_time(date(2020, 7, 11),date(2022,7,11))
+df = troubleLoader.working_dataset.loc[:,["bp_to","bp_from","reduction_capacity","date_to","date_from"]]
 
 
 def main_structure():
@@ -63,11 +65,11 @@ def main_structure():
         html.Div([
             dcc.DatePickerRange(
                 id='date-range-graphic',
-                min_date_allowed=date(1995, 8, 5),
-                max_date_allowed=date(2017, 9, 19),
-                initial_visible_month=date(2017, 8, 5),
-                start_date=date(2017, 7, 25),
-                end_date=date(2017, 8, 25),
+                min_date_allowed=date(2020, 7, 11),
+                max_date_allowed=date(2050, 7, 11),
+                initial_visible_month=date(2020, 7, 11),
+                start_date=date(2020, 7, 11),
+                end_date=date(2021, 7, 11),
                 style={"margin-left": "80px", "margin-top": "15px", "margin-bottom": "4px", 'float': 'left'}
             ), dcc.RadioItems(
                 id='day-night-select',
@@ -83,7 +85,6 @@ def main_structure():
                       ),
              html.Div([html.Div(id='output-container-date-picker-range'),
                        html.Div(id='output-point-click'),
-                       html.Div(id='output-day-night'),
                        dash_table.DataTable(
                            id='table',
                            columns=[{"name": i, "id": i} for i in df.columns],
@@ -92,7 +93,11 @@ def main_structure():
                            style_cell={
                                'backgroundColor': 'rgb(50, 50, 50)',
                                'color': 'white'
-                           })
+                           },
+                            style_table={
+                                'maxHeight': '75vh',
+                                'overflowY': 'scroll'
+                            })
                        ], style={"width": "25%", "height": "99%", "border": "1px solid black", "float": "right"})],
             style={"width": "99%", "height": "80vh", "border": "1px solid black", "margin-left": "10px"}),
 
