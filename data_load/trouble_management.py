@@ -31,8 +31,8 @@ class TroubleManager:
             self.apply_filters()
         self.filters_used["time"] = (start_time, end_time)
         self.working_dataset = self.working_dataset[
-            (self.working_dataset["date_from"] >= pd.to_datetime(start_time, infer_datetime_format=True)) &
-            (self.working_dataset["date_to"] <= pd.to_datetime(end_time, infer_datetime_format=True))]
+            ~((self.working_dataset["date_from"] > pd.to_datetime(end_time, infer_datetime_format=True)) |
+              (self.working_dataset["date_to"] < pd.to_datetime(start_time, infer_datetime_format=True)))]
 
     def filter_by_line(self, line):
         if "line" in self.filters_used:
@@ -51,8 +51,8 @@ class TroubleManager:
 
     def get_unassigned_constructions(self, start_time, end_time):
         return self.constructions_dataset[
-            (self.constructions_dataset["date_from"] >= pd.to_datetime(start_time, infer_datetime_format=True)) &
-            (self.constructions_dataset["date_to"] <= pd.to_datetime(end_time, infer_datetime_format=True)) &
+            ~((self.constructions_dataset["date_from"] > pd.to_datetime(end_time, infer_datetime_format=True)) |
+              (self.constructions_dataset["date_to"] < pd.to_datetime(start_time, infer_datetime_format=True))) &
             (self.constructions_dataset["reduction_capacity"].isna())]
 
     def get_intersecting_constructions(self, construction):
