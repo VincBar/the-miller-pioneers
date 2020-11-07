@@ -22,7 +22,7 @@ d['mode'] = ['markers+lines'] * len(d)
 print(d)
 
 fig = px.line_mapbox(d, lat="lat", lon="lon", hover_name="bezeichnung_bps", hover_data=["linienname", "linie"],
-                        line_group='line_group', color='line_group')
+                     line_group='line_group', color='line_group')
 
 '''
 for i, line in enumerate(line_info(d)):
@@ -37,7 +37,6 @@ for i, line in enumerate(line_info(d)):
 line_data = LineLoader().load()
 construction_data = ConstructionSiteLoader().load()
 troubleLoader = TroubleManager(construction_data, line_data)
-
 
 fig.update_layout(
     mapbox_zoom=6,  # hardcoded values for center of switzerland, can be adjusted automagically when we have the data
@@ -55,8 +54,8 @@ fig.update_layout(
     ])
 fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
-troubleLoader.filter_by_time(date(2020, 7, 11),date(2025,7,11))
-df = troubleLoader.working_dataset.loc[:,["bp_to","bp_from","reduction_capacity","date_to","date_from"]]
+troubleLoader.filter_by_time(date(2020, 7, 11), date(2025, 7, 11))
+df = troubleLoader.working_dataset.loc[:, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
 
 
 def main_structure():
@@ -78,7 +77,7 @@ def main_structure():
                 style={"margin-left": "20px", "margin-top": "19px", 'float': 'left'}
             )], style={"margin-left": "10px", "margin-bottom": "10px", "display": "table-row"}),
         html.Div(
-            [html.Div(dcc.Graph(id='basic-map',figure=fig, style={'height': "75vh"}),
+            [html.Div(dcc.Graph(id='basic-map', figure=fig, style={'height': "75vh"}),
                       style={"width": "70%", "height": "99%", "border": "1px solid black", "float": "left"},
                       className="one-third column",
                       ),
@@ -93,11 +92,10 @@ def main_structure():
                                'backgroundColor': 'rgb(50, 50, 50)',
                                'color': 'white'
                            },
-                            style_table={
-                                'maxHeight': '75vh',
-                                'overflowY': 'scroll'
-                            })
+                           style_table={
+                               'maxHeight': '75vh',
+                               'overflowY': 'scroll'
+                           })
                        ], style={"width": "25%", "height": "99%", "border": "1px solid black", "float": "right"})],
             style={"width": "99%", "height": "80vh", "border": "1px solid black", "margin-left": "10px"}),
-
     ], style={"border": "1px solid black"})
