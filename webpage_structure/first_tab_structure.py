@@ -8,20 +8,24 @@ import pandas as pd
 import plotly.express as px
 from datetime import date
 
-with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
-    counties = json.load(response)
-
-df = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/fips-unemp-16.csv",
-                 dtype={"fips": str})
-
-fig = px.choropleth_mapbox(df, geojson=counties, locations='fips', color='unemp',
-                           color_continuous_scale="Viridis",
-                           range_color=(0, 12),
-                           mapbox_style="carto-positron",
-                           zoom=3, center={"lat": 37.0902, "lon": -95.7129},
-                           opacity=0.5,
-                           labels={'unemp': 'unemployment rate'}
-                           )
+# dummy data for plotting
+us_cities = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/us-cities-top-1k.csv")
+fig = px.scatter_mapbox(us_cities, lat="lat", lon="lon", hover_name="City", hover_data=["State", "Population"],
+                        color_discrete_sequence=["fuchsia"])
+fig.update_layout(
+    mapbox_zoom=6,  # hardcoded values for center of switzerland, can be adjusted automagically when we have the data
+    mapbox_center_lat=46.87,
+    mapbox_center_lon=8.13,
+    mapbox_style="white-bg",
+    mapbox_layers=[
+        {
+            "below": 'traces',
+            "sourcetype": "raster",
+            "source": [
+                "http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+            ]
+        }
+    ])
 fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
 
