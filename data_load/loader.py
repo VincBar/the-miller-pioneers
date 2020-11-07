@@ -58,15 +58,17 @@ class ConstructionSiteLoader(DataLoader):
     LOAD_FIELDS = {"bp_from", "bp_to", 'region', 'reduction_capacity',
                    "umsetzung_intervalltyp_umleitung", "date_from", "date_to"}
 
-    params = {"rows": str(-1), "facet": "region"}
+    params = {"rows": str(-1), "facet": "umsetzung_intervalltyp_umleitung",
+              "exclude.umsetzung_intervalltyp_umleitung": "Umleitung"}
 
     def set_sort_start_time(self):
         self.params["sort"] = "-date_from"
         return self
-
+    """
     def filter_region(self, region):
         self.params["refine.region"] = str(region)
         return self
+    """
 
 
 class RoutesLoader(DataLoader):
