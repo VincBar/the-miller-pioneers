@@ -35,11 +35,13 @@ def render_content(tab):
     elif tab == 'tab-2':
         return second.main_structure()
 
+
 @app.callback(
     Output('output-point-click', 'children'),
     [Input('basic-map', 'clickData')])
 def display_click_data(clickData):
     return json.dumps(clickData, indent=2)
+
 
 #
 @app.callback(
@@ -102,22 +104,24 @@ def update_output(start_date, end_date, value):
 
 @app.callback(
     [dash.dependencies.Output('first_column', 'children'),
-    dash.dependencies.Output('second_column', 'children'),
-    dash.dependencies.Output('third_column', 'children')],
+     dash.dependencies.Output('second_column', 'children'),
+     dash.dependencies.Output('third_column', 'children')],
     [dash.dependencies.Input('ordering-selection', 'value')]
 )
 def content_update(ordering_selection):
+    print(ordering_selection)
     if ordering_selection == "severe":
         return second.severe(column=0), second.severe(column=1), second.severe(column=2)
-    if ordering_selection == "normal":
+    elif ordering_selection == "normal":
         return second.severe(column=0), second.severe(column=1), second.severe(column=2)
-    if ordering_selection == "capcity":
+    elif ordering_selection == "capcity":
         return second.severe(column=0), second.severe(column=1), second.severe(column=2)
-    if ordering_selection == "time":
+    elif ordering_selection == "time":
         return second.severe(column=0), second.severe(column=1), second.severe(column=2)
-    if ordering_selection == "conflict":
-        return second.severe(column=0), second.severe(column=1), second.severe(column=2)
-
+    elif ordering_selection == "conflict":
+        return second.conflict(column=0), second.conflict(column=1), second.conflict(column=2)
+    else:
+        print("hi")
 
 # need vh for now later will scale to the size of the content
 if __name__ == '__main__':
