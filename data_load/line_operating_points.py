@@ -17,8 +17,8 @@ def line_info(df):
         one_line = one_line.sort_values(by=['km'])  # sort by distance from starting point
 
         line_dict = {
-            "line_number": one_line.linie[n],
-            "line_name": one_line.linienname[n],
+            "line_number": one_line.linie.iloc[0],
+            "line_name": one_line.linienname.iloc[0],
             "n_stop": one_line.shape[0],
             "lon": one_line['longitude'].to_list(),
             "lat": one_line['longitude'].to_list(),
@@ -33,14 +33,14 @@ def line_info(df):
     return one_line, all_lines
 
 
-loader = LineLoader()
-loader.set_sort_lines()
-d = loader.load()
+if "__name__" == "__main__":
+    loader = LineLoader()
+    loader.set_sort_lines()
+    d = loader.load()
 
-[blub, blab] = line_info(d)
+    [blub, blab] = line_info(d)
 
-#loader.set_n(4).load()
+    #loader.set_n(4).load()
 
 
-print(line_info(d))
-
+    print(line_info(d))
