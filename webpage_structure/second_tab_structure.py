@@ -128,7 +128,7 @@ def severe_plot(column=1, start_date=date(2020, 7, 11), end_date=date(2021, 7, 1
     fig.update_layout(barmode='group')
     if column == 1:
         return html.Div([
-            html.H6("Reduction on Train Numbers Visualized top 1-5"),
+            html.H6("Reduction on Train Numbers top 1-5"),
             dcc.Graph(id='reduction-bar-low-{}'.format(column), figure=fig, style={'height': "50vh", "width": "100%"})]
             , style={"margin-top": "20px"})
     else:
