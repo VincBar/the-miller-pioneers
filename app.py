@@ -59,7 +59,7 @@ for i, (k, line) in enumerate(all_lines.items()):
         fig.add_trace(go.Scattermapbox(**line_dict))
 fig.update_layout(**map_layout)
 
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, title='SBB Bottleneck')
 server = app.server
 
 layout = dict(
@@ -74,8 +74,8 @@ layout = dict(
 
 app.layout = html.Div([
     dcc.Tabs(id='tabs-example', value='tab-2', children=[
-        dcc.Tab(label='Switzerland Overview', value='tab-1'),
-        dcc.Tab(label='Conflict Analysis', value='tab-2'),
+        dcc.Tab(label='Switzerland Overview', value='tab-1', selected_style={"fontWeight": 'bold'}),
+        dcc.Tab(label='Conflict Analysis', value='tab-2', selected_style={"fontWeight": 'bold'}),
     ]),
     html.Div(id='tabs-example-content')
 ],
