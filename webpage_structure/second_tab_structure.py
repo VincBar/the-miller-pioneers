@@ -5,6 +5,7 @@ import dash_table
 import pandas as pd
 from webpage_structure.first_tab_structure import troubleLoader
 import plotly.express as px
+import numpy as np
 
 
 def main_structure():
@@ -45,7 +46,6 @@ def main_structure():
     ])
 
 
-import numpy as np
 
 
 def severe(column=0):
@@ -95,12 +95,19 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
         dash_table.DataTable(
             id='table_in_{}'.format(column),
             columns=[{"name": i, "id": i} for i in df_in.columns],
-            data=df_in.to_dict('records')),
+            data=df_in.to_dict('records'),
+            style_table={
+                'overflowY': 'scroll'
+            }
+        ),
         html.H6("Conflicts to keep in mind"),
         dash_table.DataTable(
             id='table_focus_{}'.format(column),
             columns=[{"name": i, "id": i} for i in df_conflict.columns],
-            data=df_conflict.to_dict('records')),
+            data=df_conflict.to_dict('records'),
+            style_table={
+                'overflowY': 'scroll'
+            }),
         dcc.Graph(id='basic-time-{}'.format(column), figure=time_plot, style={'height': "30vh","width":"100%"})
     ])
 

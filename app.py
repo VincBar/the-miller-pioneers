@@ -17,13 +17,26 @@ from webpage_structure.first_tab_structure import troubleLoader
 
 app = dash.Dash(__name__)
 server = app.server
+
+layout = dict(
+    autosize=True,
+    automargin=True,
+    margin=dict(l=30, r=30, b=20, t=40),
+    hovermode="closest",
+    plot_bgcolor="#F9F9F9",
+    paper_bgcolor="#F9F9F9",
+    legend=dict(font=dict(size=10), orientation="h"),
+)
+
 app.layout = html.Div([
     dcc.Tabs(id='tabs-example', value='tab-2', children=[
         dcc.Tab(label='Switzerland Overview', value='tab-1'),
         dcc.Tab(label='Trouble Analysis', value='tab-2'),
     ]),
     html.Div(id='tabs-example-content')
-], style={"height": "95vh", "border": "1px solid black"}
+],
+    id="mainContainer",
+    style={"height": "95vh"},
 )
 
 
