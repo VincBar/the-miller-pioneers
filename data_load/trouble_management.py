@@ -31,6 +31,7 @@ class TroubleManager:
             self.apply_filters()
         self.filters_used["time"] = (start_time, end_time)
         self.working_dataset = self.working_dataset[
+            (self.working_dataset["date_from"].notnull()) & (self.working_dataset["date_to"].notnull()) &
             ~((self.working_dataset["date_from"] > pd.to_datetime(end_time, infer_datetime_format=True)) |
               (self.working_dataset["date_to"] < pd.to_datetime(start_time, infer_datetime_format=True)))]
 
@@ -51,12 +52,14 @@ class TroubleManager:
 
     def get_unassigned_constructions(self, start_time, end_time):
         return self.constructions_dataset[
+            (self.constructions_dataset["date_from"].notnull()) & (self.constructions_dataset["date_to"].notnull()) &
             ~((self.constructions_dataset["date_from"] > pd.to_datetime(end_time, infer_datetime_format=True)) |
               (self.constructions_dataset["date_to"] < pd.to_datetime(start_time, infer_datetime_format=True))) &
             (self.constructions_dataset["reduction_capacity"].isna())]
 
     def get_intersecting_constructions(self, construction):
         return self.constructions_dataset[
+            (self.constructions_dataset["date_from"].notnull()) & (self.constructions_dataset["date_to"].notnull()) &
             ~((self.constructions_dataset["date_from"] >= pd.to_datetime(construction["date_to"],
                                                                          infer_datetime_format=True))
               | (self.constructions_dataset["date_to"] <= pd.to_datetime(construction["date_from"],
@@ -73,3 +76,9 @@ class TroubleManager:
             result.append((construction, conflicts))
         result.sort(key=lambda x: len(x[1]))
         return result
+
+    def get_lines_affected_constructions(self, construction):
+        return self.operation_points_dataset[
+            self.operation_points_dataset["abkurzung_bpk"] == construction["bp_from"]
+            | self.operation_points_dataset["abkurzung_bpk"] == construction["bp_to"]
+        ]["linie"]
