@@ -56,7 +56,7 @@ class LineLoader(DataLoader):
 class ConstructionSiteLoader(DataLoader):
     REQUEST_API = "https://data.sbb.ch/api/records/1.0/search/?dataset=construction-site"
     LOAD_FIELDS = {"bp_from", "bp_to", 'region', 'reduction_capacity',
-                   "umsetzung_intervalltyp_umleitung", "date_from", "date_to", "linienname", ""}
+                   "umsetzung_intervalltyp_umleitung", "date_from", "date_to", "linienname"}
 
     params = {"rows": str(-1), "facet": "umsetzung_intervalltyp_umleitung",
               "exclude.umsetzung_intervalltyp_umleitung": "Umleitung"}
