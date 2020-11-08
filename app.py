@@ -25,7 +25,7 @@ all_lines, abbr_dict = line_info(map_data)
 
 map_layout = dict(
     margin={"r": 0, "t": 0, "l": 0, "b": 0},
-    mapbox_zoom=6,
+    mapbox_zoom=7.5,
     mapbox_center_lat=46.87,
     mapbox_center_lon=8.13,
     mapbox_style="white-bg",
@@ -34,8 +34,7 @@ map_layout = dict(
             "below": 'traces',
             "sourcetype": "raster",
             "source": [
-                'https://tile.osm.ch/switzerland/{z}/{x}/{y}.png'
-                # "http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+                'http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png'
             ]
         }
     ],
@@ -51,8 +50,8 @@ for i, (k, line) in enumerate(all_lines.items()):
                      lat=line['lat'],
                      text=line['stop_name'],
                      # hoverinfo=line['stop_name'],
-                     marker={'size': 5, 'color': 'green'},
-                     line={'color': "green"})
+                     marker={'size': 6, 'color': '#238823'},
+                     line={'color': "#238823"})
     if i == 0:
         fig = go.Figure(go.Scattermapbox(**line_dict))
     if line['n_stop'] > 8:
@@ -159,10 +158,12 @@ def update_output(start_date, end_date, value):
     fig.data = fig.data[:drawn_lines]
 
     for index, issue in df.iterrows():
-        if issue['reduction_capacity'] >= 0.5:
-            color = 'red'
+        if issue['reduction_capacity'] <= 0.25:
+            color = '#ffbf00'
+        elif issue['reduction_capacity'] <= 0.5:
+            color = '#d2222d'
         else:
-            color = 'yellow'
+            color = '#d2222d'
 
         try:
             line_dict = dict(mode="markers+lines",
