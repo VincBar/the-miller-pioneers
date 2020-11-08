@@ -79,6 +79,6 @@ class TroubleManager:
 
     def get_lines_affected_constructions(self, construction):
         return self.operation_points_dataset[
-            self.operation_points_dataset["abkurzung_bpk"] == construction["bp_from"]
-            | self.operation_points_dataset["abkurzung_bpk"] == construction["bp_to"]
-        ]["linie"]
+            (self.operation_points_dataset["abkurzung_bpk"] == construction["bp_from"])
+            | (self.operation_points_dataset["abkurzung_bpk"] == construction["bp_to"])
+        ]["linie"].unique()
