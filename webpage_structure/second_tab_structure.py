@@ -25,7 +25,7 @@ def main_structure():
                 max_date_allowed=date(2050, 7, 11),
                 initial_visible_month=date(2020, 7, 11),
                 start_date=date(2020, 7, 11),
-                end_date=date(2021, 7, 11),
+                end_date=date(2022, 7, 11),
                 style={"margin-left": "80px", "margin-top": "15px", "margin-bottom": "4px", 'float': 'left'}
             ),
             dcc.RadioItems(
@@ -96,8 +96,9 @@ def severe(column=0,start_date = date(2020, 7, 11),end_date=date(2021, 7, 11)):
     tmp = tmp.loc[:, ["umsetzung_intervalltyp_umleitung","reduction_capacity","num_trains",   "cancelled_trains"]]
     names = ["Index","Construction", "Red. Capacity", "Usual Trains",  "Red. Train Capacity"]
     tmp.reset_index(inplace=True)
-    tmp=tmp.round(0)
+    tmp=tmp.round(2)
     return html.Div([
+        html.H6("Strongest Reduction on Train Numbers"),
         dash_table.DataTable(
             id='table_focus_{}'.format(column),
             columns=[{"name": names[j], "id": i} for j, i in enumerate(tmp.columns)],
@@ -169,7 +170,7 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
                 columns=[{"name": names_1[j], "id": i} for j, i in enumerate(df_in.columns)],
                 data=df_in.to_dict('records'),
                 style_table={
-                    'overflowY': 'scroll'
+                    'overflowX': 'scroll'
                 }
             ),
             html.H6("Conflicts to keep in mind", style={"text-align": "centre"}),
@@ -178,7 +179,7 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
                 columns=[{"name": names_2[j], "id": i} for j, i in enumerate(df_conflict.columns)],
                 data=df_conflict.to_dict('records'),
                 style_table={
-                    'overflowY': 'scroll'
+                    'overflowX': 'scroll'
                 })],style={"height":"30vh"}),
             dcc.Graph(id='basic-time-{}'.format(column), figure=time_plot, style={'height': "45vh", "width": "100%"})
         ])
