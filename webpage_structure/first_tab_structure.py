@@ -53,13 +53,14 @@ line_data = LineLoader().load()
 construction_data = ConstructionSiteLoader().load()
 troubleLoader = TroubleManager(construction_data, line_data)
 troubleLoader.filter_by_time(date(2020, 7, 11), date(2025, 7, 11))
-df = troubleLoader.working_dataset.loc[:, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
+df = troubleLoader.working_dataset.loc[:, ["bp_to", "bp_from", "reduction_capacity", "date_from", "date_to"]]
 
 troubleLoader.filter_by_time(date(2020, 7, 11), date(2025, 7, 11))
-df = troubleLoader.working_dataset.loc[:, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
+df = troubleLoader.working_dataset.loc[:, ["bp_to", "bp_from", "reduction_capacity", "date_from", "date_to"]]
 
 
 def main_structure():
+    names = ["From BP", "To BP", "Red. Capacity", "Building from", "Building till"]
     return html.Div([
         html.Div([
             dcc.DatePickerRange(
@@ -69,13 +70,14 @@ def main_structure():
                 initial_visible_month=date(2020, 7, 11),
                 start_date=date(2020, 7, 11),
                 end_date=date(2021, 7, 11),
-                style={"margin-left": "80px", "margin-top": "15px", "margin-bottom": "4px", 'float': 'left',"className":"dcc_control"}
+                style={"margin-left": "80px", "margin-top": "15px", "margin-bottom": "4px", 'float': 'left',
+                       "className": "dcc_control"}
             ), dcc.RadioItems(
                 id='day-night-select',
                 options=[{'label': i, 'value': i} for i in ['Day', 'Night', 'Complete']],
                 value='Complete',
                 labelStyle={'display': 'inline-block'},
-                style={"margin-left": "20px", "margin-top": "19px", 'float': 'left',"className":"dcc_control"}
+                style={"margin-left": "20px", "margin-top": "19px", 'float': 'left', "className": "dcc_control"}
             )], style={"margin-left": "10px", "margin-bottom": "10px", "display": "table-row"}),
         html.Div(
             [html.Div(dcc.Graph(id='basic-map', figure=fig, style={'height': "75vh"}),
@@ -92,7 +94,7 @@ def main_structure():
                        html.Div(id='output-point-click'),
                        dash_table.DataTable(
                            id='table',
-                           columns=[{"name": i, "id": i} for i in df.columns],
+                           columns=[{"name": names[j], "id": i} for j, i in enumerate(df.columns)],
                            data=df.to_dict('records'),
                            style_header={'backgroundColor': 'rgb(30, 30, 30)'},
                            style_cell={
@@ -117,7 +119,7 @@ def main_structure():
                    "height": "80vh",
                    "margin-left": "10px",
                    }
-                   ),
+        ),
     ])
 # "-webkit-box-shadow": "7px 7px 5px 0px rgba(50, 50, 50, 0.75)",
 #                    "-moz-box-shadow": "7px 7px 5px 0px rgba(50, 50, 50, 0.75)",

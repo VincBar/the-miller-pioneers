@@ -74,40 +74,46 @@ def reformat_datetime(df, columns_relevant):
 
 
 def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11)):
-    df_in = pd.DataFrame(
-        troubleLoader.get_conflicts_in_timeframe(start_time, end_time)[-(column + 1)][0]).transpose()
-    df_in.reset_index(inplace=True)
-    df_conflict = pd.DataFrame(
-        troubleLoader.get_conflicts_in_timeframe(start_time, end_time)[-(column + 1)][1])
-    df_conflict.reset_index(inplace=True)
-    df_in = reformat_datetime(df_in, ["index", "reduction_capacity", "date_from", "date_to"])
-    df_conflict = reformat_datetime(df_conflict, ["index", "reduction_capacity", "date_from", "date_to"])
-    df = pd.concat([df_in,df_conflict])
-    df.loc[:,"index"]=["Job {}".format(el) for el in df["index"].values]
+    if len(troubleLoader.get_conflicts_in_timeframe(start_time, end_time))<=column:
+        return html.Div([html.H6("No more unscheduled conflicts")])
+    else:
+        df_in = pd.DataFrame(
+            troubleLoader.get_conflicts_in_timeframe(start_time, end_time)[-(column + 1)][0]).transpose()
+        df_in.reset_index(inplace=True)
+        df_conflict = pd.DataFrame(
+            troubleLoader.get_conflicts_in_timeframe(start_time, end_time)[-(column + 1)][1])
+        df_conflict.reset_index(inplace=True)
+        df_in = reformat_datetime(df_in, ["index","reduction_capacity", "date_from", "date_to"])
+        df_conflict = reformat_datetime(df_conflict, ["index","umsetzung_intervalltyp_umleitung", "reduction_capacity", "date_from", "date_to"])
+        df = pd.concat([df_in,df_conflict])
+        df.loc[:,"index"]=["Job {}".format(el) for el in df["index"].values]
+        names_1 = ["Identifier","Red. Capacity","Building from", "Building till"]
 
-    time_plot = px.timeline(df, x_start="date_from", x_end="date_to", y="index",color="reduction_capacity")
-    time_plot.update_yaxes(autorange="reversed")
-    time_plot.update_xaxes(autorange="reversed")
-    time_plot.update_layout(xaxis=dict(tickformat="%Y-%m"))
-    # otherwise tasks are listed from the bottom up
-    return html.Div([
-        html.H6("Implementation not planned yet"),
-        dash_table.DataTable(
-            id='table_in_{}'.format(column),
-            columns=[{"name": i, "id": i} for i in df_in.columns],
-            data=df_in.to_dict('records'),
-            style_table={
-                'overflowY': 'scroll'
-            }
-        ),
-        html.H6("Conflicts to keep in mind"),
-        dash_table.DataTable(
-            id='table_focus_{}'.format(column),
-            columns=[{"name": i, "id": i} for i in df_conflict.columns],
-            data=df_conflict.to_dict('records'),
-            style_table={
-                'overflowY': 'scroll'
-            }),
-        dcc.Graph(id='basic-time-{}'.format(column), figure=time_plot, style={'height': "30vh","width":"100%"})
-    ])
+        names_2 = ["Identifier","Umsetzung", "Red. Capacity","Building from", "Building till"]
+
+        time_plot = px.timeline(df, x_start="date_from", x_end="date_to", y="index",color="reduction_capacity")
+        time_plot.update_yaxes(autorange="reversed")
+        time_plot.update_xaxes(autorange="reversed")
+        time_plot.update_layout(xaxis=dict(tickformat="%Y-%m"))
+        # otherwise tasks are listed from the bottom up
+        return html.Div([
+            html.H6("Implementation not planned yet"),
+            dash_table.DataTable(
+                id='table_in_{}'.format(column),
+                columns=[{"name": names_1[j], "id": i} for j,i in enumerate(df_in.columns)],
+                data=df_in.to_dict('records'),
+                style_table={
+                    'overflowY': 'scroll'
+                }
+            ),
+            html.H6("Conflicts to keep in mind"),
+            dash_table.DataTable(
+                id='table_focus_{}'.format(column),
+                columns=[{"name": names_2[j], "id": i}  for j,i in enumerate(df_conflict.columns)],
+                data=df_conflict.to_dict('records'),
+                style_table={
+                    'overflowY': 'scroll'
+                }),
+            dcc.Graph(id='basic-time-{}'.format(column), figure=time_plot, style={'height': "30vh","width":"100%"})
+        ])
 

@@ -59,7 +59,7 @@ def display_click_data(clickData):
 #
 @app.callback(
     [dash.dependencies.Output('table', 'data'),
-     dash.dependencies.Output('basic-map', 'figure'),],
+     dash.dependencies.Output('basic-map', 'figure'), ],
     [dash.dependencies.Input('date-range-graphic', 'start_date'),
      dash.dependencies.Input('date-range-graphic', 'end_date'),
      dash.dependencies.Input('day-night-select', 'value')])
@@ -69,15 +69,15 @@ def update_output(start_date, end_date, value):
         filter = np.logical_not(np.in1d(troubleLoader.working_dataset.loc[:, 'umsetzung_intervalltyp_umleitung'],
                                         ["Sperre Bahnhof Nacht", "Sperre Strecke Nacht"]))
         df = troubleLoader.working_dataset.loc[
-            filter, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
+            filter, ["bp_to", "bp_from", "reduction_capacity","date_from","date_to"]]
     elif value == 'Night':
         filter = np.logical_not(np.in1d(troubleLoader.working_dataset.loc[:, 'umsetzung_intervalltyp_umleitung'],
                                         ["Sperre Bahnhof Tag", "Sperre Strecke Tag"]))
         df = troubleLoader.working_dataset.loc[
-            filter, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
+            filter, ["bp_to", "bp_from", "reduction_capacity", "date_from","date_to"]]
     else:
         df = troubleLoader.working_dataset.loc[
-             :, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
+             :, ["bp_to", "bp_from", "reduction_capacity", "date_from","date_to"]]
 
     df.loc[:, "date_to"] = pd.DatetimeIndex(df.loc[:, "date_to"]).strftime("%Y-%m-%d")
     df.loc[:, "date_from"] = pd.DatetimeIndex(df.loc[:, "date_from"]).strftime("%Y-%m-%d")
@@ -121,9 +121,9 @@ def update_output(start_date, end_date, value):
      dash.dependencies.Output('third_column', 'children')],
     [dash.dependencies.Input('ordering-selection', 'value'),
      dash.dependencies.Input('date-range-trouble', 'start_date'),
-     dash.dependencies.Input('date-range-trouble', 'end_date'),]
+     dash.dependencies.Input('date-range-trouble', 'end_date'), ]
 )
-def content_update(ordering_selection,start_date,end_date):
+def content_update(ordering_selection, start_date, end_date):
     print(ordering_selection)
     if ordering_selection == "severe":
         return second.severe(column=0), second.severe(column=1), second.severe(column=2)
@@ -134,9 +134,12 @@ def content_update(ordering_selection,start_date,end_date):
     elif ordering_selection == "time":
         return second.severe(column=0), second.severe(column=1), second.severe(column=2)
     elif ordering_selection == "conflict":
-        return second.conflict(0,start_date,end_date), second.conflict(1,start_date,end_date), second.conflict(2,start_date,end_date)
+        return second.conflict(0, start_date, end_date), second.conflict(1, start_date, end_date), second.conflict(2,
+                                                                                                                   start_date,
+                                                                                                                   end_date)
     else:
         print("hi")
+
 
 # need vh for now later will scale to the size of the content
 if __name__ == '__main__':
