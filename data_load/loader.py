@@ -41,7 +41,7 @@ class DataLoader:
 
 class LineLoader(DataLoader):
     REQUEST_API = "https://data.sbb.ch/api/records/1.0/search/?dataset=linie-mit-betriebspunkten"
-    LOAD_FIELDS = {"linie", "km", 'abkurzung_bpk', 'abkurzung_bps', 'linienname', "bezeichnung_bps"}
+    LOAD_FIELDS = {"linie", "km", 'abkurzung_bpk', 'abkurzung_bps', 'linienname', "bezeichnung_bps", "geopos"}
 
     params = {"rows": str(-1), "facet": "linie"}
 
