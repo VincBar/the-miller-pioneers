@@ -10,7 +10,6 @@ from data_load.utils import line_info
 import plotly.express as px
 import plotly.graph_objects as go
 
-
 import pandas as pd
 import numpy as np
 from datetime import date
@@ -35,7 +34,8 @@ map_layout = dict(
             "below": 'traces',
             "sourcetype": "raster",
             "source": [
-                'https://tile.osm.ch/switzerland/{z}/{x}/{y}.png'#"http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+                'https://tile.osm.ch/switzerland/{z}/{x}/{y}.png'
+                # "http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
             ]
         }
     ])
@@ -73,7 +73,7 @@ layout = dict(
 )
 
 app.layout = html.Div([
-    dcc.Tabs(id='tabs-example', value='tab-2', children=[
+    dcc.Tabs(id='tabs-example', value='tab-1', children=[
         dcc.Tab(label='Switzerland Overview', value='tab-1'),
         dcc.Tab(label='Trouble Analysis', value='tab-2'),
     ]),
@@ -95,9 +95,26 @@ def render_content(tab):
 
 @app.callback(
     Output('output-point-click', 'children'),
-    [Input('basic-map', 'clickData')])
-def display_click_data(clickData):
-    return json.dumps(clickData, indent=2)
+    [dash.dependencies.Input('date-range-graphic', 'start_date'),
+     dash.dependencies.Input('date-range-graphic', 'end_date'),
+     Input('basic-map', 'clickData')])
+def display_click_data(start_date, end_date, clickData):
+    troubleLoader.filter_by_time(start_date, end_date)
+    print("Hi")
+    df = troubleLoader.working_dataset
+    print("Hi")
+
+    df.loc[:, "date_to"] = pd.DatetimeIndex(df.loc[:, "date_to"]).strftime("%Y-%m-%d")
+    df.loc[:, "date_from"] = pd.DatetimeIndex(df.loc[:, "date_from"]).strftime("%Y-%m-%d")
+    print("Hi")
+    print(clickData)
+    if clickData is None:
+        return json.dumps(clickData, indent=2)
+    else:
+        index_list = np.logical_or(df.loc[:, "bp_from"] == clickData["points"][0]["text"],
+                                   df.loc[:, "bp_to"] == clickData["points"][0]["text"])
+        print(df.loc[index_list, :])
+        return json.dumps(clickData, indent=2)
 
 
 #
@@ -113,15 +130,15 @@ def update_output(start_date, end_date, value):
         filter = np.logical_not(np.in1d(troubleLoader.working_dataset.loc[:, 'umsetzung_intervalltyp_umleitung'],
                                         ["Sperre Bahnhof Nacht", "Sperre Strecke Nacht"]))
         df = troubleLoader.working_dataset.loc[
-            filter, ["bp_to", "bp_from", "reduction_capacity","date_from","date_to"]]
+            filter, ["bp_to", "bp_from", "reduction_capacity", "date_from", "date_to"]]
     elif value == 'Night':
         filter = np.logical_not(np.in1d(troubleLoader.working_dataset.loc[:, 'umsetzung_intervalltyp_umleitung'],
                                         ["Sperre Bahnhof Tag", "Sperre Strecke Tag"]))
         df = troubleLoader.working_dataset.loc[
-            filter, ["bp_to", "bp_from", "reduction_capacity", "date_from","date_to"]]
+            filter, ["bp_to", "bp_from", "reduction_capacity", "date_from", "date_to"]]
     else:
         df = troubleLoader.working_dataset.loc[
-             :, ["bp_to", "bp_from", "reduction_capacity", "date_from","date_to"]]
+             :, ["bp_to", "bp_from", "reduction_capacity", "date_from", "date_to"]]
 
     df.loc[:, "date_to"] = pd.DatetimeIndex(df.loc[:, "date_to"]).strftime("%Y-%m-%d")
     df.loc[:, "date_from"] = pd.DatetimeIndex(df.loc[:, "date_from"]).strftime("%Y-%m-%d")

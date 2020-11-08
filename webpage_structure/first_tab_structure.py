@@ -57,7 +57,6 @@ def main_structure():
                       className="one-third column",
                       ),
              html.Div([html.Div(id='output-container-date-picker-range'),
-                       html.Div(id='output-point-click'),
                        dash_table.DataTable(
                            id='table',
                            columns=[{"name": names[j], "id": i} for j, i in enumerate(df.columns)],
@@ -71,7 +70,8 @@ def main_structure():
                            style_table={
                                'maxHeight': '75vh',
                                'overflowY': 'scroll'
-                           })
+                           }),
+                       html.Div(id='output-point-click')
                        ],
                       style={"width": "25%",
                              "height": "99%",
