@@ -77,10 +77,10 @@ def most_severe(start_time, end_time):
 
     routes_constr["cancelled_trains"] = routes_constr["cancelled_trains"] * (
             routes_constr["date_to"] - routes_constr["date_from"]).apply(lambda x: x.days) / 365
-    routes_constr["trains_complete_time"] = routes_constr["num_trains"]* (
+    routes_constr["trains_complete_time"] = routes_constr["num_trains"] * (
             routes_constr["date_to"] - routes_constr["date_from"]).apply(lambda x: x.days) / 365
     routes_constr.sort_values("cancelled_trains", ascending=False, inplace=True)
-    five_most_critical = routes_constr.iloc[0:5, :]
+    five_most_critical = routes_constr.iloc[0:10, :]
 
     return five_most_critical
 
@@ -88,15 +88,15 @@ def most_severe(start_time, end_time):
 from datetime import date
 
 
-def severe(column=0,start_date = date(2020, 7, 11),end_date=date(2021, 7, 11)):
+def severe(column=0, start_date=date(2020, 7, 11), end_date=date(2021, 7, 11)):
     # some getting df stuff.
 
     tmp = most_severe(start_date, end_date)
 
-    tmp = tmp.loc[:, ["umsetzung_intervalltyp_umleitung","reduction_capacity","num_trains",   "cancelled_trains"]]
-    names = ["Index","Construction", "Red. Capacity", "Usual Trains",  "Red. Train Capacity"]
+    tmp = tmp.loc[:, ["umsetzung_intervalltyp_umleitung", "reduction_capacity", "num_trains", "cancelled_trains"]]
+    names = ["Index", "Construction", "Red. Capacity", "Usual Trains", "Red. Train Capacity"]
     tmp.reset_index(inplace=True)
-    tmp=tmp.round(2)
+    tmp = tmp.round(2)
     return html.Div([
         html.H6("Strongest Reduction on Train Numbers"),
         dash_table.DataTable(
@@ -107,25 +107,38 @@ def severe(column=0,start_date = date(2020, 7, 11),end_date=date(2021, 7, 11)):
                 'overflowY': 'scroll'
             }
         )
-    ],style={"margin-top":"20px"})
+    ], style={"margin-top": "20px"})
 
-def severe_plot(column=1,start_date = date(2020, 7, 11),end_date=date(2021, 7, 11)):
+
+def severe_plot(column=1, start_date=date(2020, 7, 11), end_date=date(2021, 7, 11)):
     # some getting df stuff.
-    start_time = date(2020, 7, 11)
-    end_time = date(2021, 7, 11)
-    tmp = most_severe(start_time, end_time)
+    tmp = most_severe(start_date, end_date)
     tmp.reset_index(inplace=True)
+    if column == 1:
+        tmp = tmp[:5]
+    else:
+        tmp = tmp[5:10]
     animals = ["Construction {}".format(el) for el in tmp["index"]]
 
     fig = go.Figure(data=[
-        go.Bar(name='Original capacity', x=animals, y=tmp["trains_complete_time"]),
-        go.Bar(name='Left capacity', x=animals, y=tmp["trains_complete_time"]-tmp["cancelled_trains"])
+        go.Bar(name='Original accumulated capacity', x=animals, y=tmp["trains_complete_time"],),
+        go.Bar(name='Left accumulated capacity', x=animals, y=tmp["trains_complete_time"] - tmp["cancelled_trains"])
     ])
     # Change the bar mode
     fig.update_layout(barmode='group')
-    return dcc.Graph(id='reduction-bar-{}'.format(column), figure=fig, style={'height': "50vh", "width": "100%"})
+    if column == 1:
+        return html.Div([
+            html.H6("Reduction on Train Numbers Visualized top 1-5"),
+            dcc.Graph(id='reduction-bar-low-{}'.format(column), figure=fig, style={'height': "50vh", "width": "100%"})]
+            , style={"margin-top": "20px"})
+    else:
+        return html.Div([
+            html.H6("Reduction on Train Numbers top 6-10"),
+            dcc.Graph(id='reduction-bar-low-{}'.format(column), figure=fig, style={'height': "50vh", "width": "100%"})]
+            , style={"margin-top": "20px"})
 
-def severe_empty(column=1,start_date = date(2020, 7, 11),end_date=date(2021, 7, 11)):
+
+def severe_empty(column=1, start_date=date(2020, 7, 11), end_date=date(2021, 7, 11)):
     return html.Div()
 
 
@@ -160,26 +173,26 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
                                 color_continuous_scale=px.colors.sequential.YlOrRd)
         time_plot.update_yaxes(autorange="reversed")
         time_plot.update_layout(xaxis=dict(tickformat="%Y-%m"))
-        time_plot.update_layout(yaxis={"title":""})
+        time_plot.update_layout(yaxis={"title": ""})
         # otherwise tasks are listed from the bottom up
         return html.Div([
             html.Div([
-            html.H6("Implementation not planned yet", style={"text-align": "centre"}),
-            dash_table.DataTable(
-                id='table_in_{}'.format(column),
-                columns=[{"name": names_1[j], "id": i} for j, i in enumerate(df_in.columns)],
-                data=df_in.to_dict('records'),
-                style_table={
-                    'overflowX': 'scroll'
-                }
-            ),
-            html.H6("Conflicts to keep in mind", style={"text-align": "centre"}),
-            dash_table.DataTable(
-                id='table_focus_{}'.format(column),
-                columns=[{"name": names_2[j], "id": i} for j, i in enumerate(df_conflict.columns)],
-                data=df_conflict.to_dict('records'),
-                style_table={
-                    'overflowX': 'scroll'
-                })],style={"height":"30vh"}),
+                html.H6("Implementation not planned yet", style={"text-align": "centre"}),
+                dash_table.DataTable(
+                    id='table_in_{}'.format(column),
+                    columns=[{"name": names_1[j], "id": i} for j, i in enumerate(df_in.columns)],
+                    data=df_in.to_dict('records'),
+                    style_table={
+                        'overflowX': 'scroll'
+                    }
+                ),
+                html.H6("Conflicts to keep in mind", style={"text-align": "centre"}),
+                dash_table.DataTable(
+                    id='table_focus_{}'.format(column),
+                    columns=[{"name": names_2[j], "id": i} for j, i in enumerate(df_conflict.columns)],
+                    data=df_conflict.to_dict('records'),
+                    style_table={
+                        'overflowX': 'scroll'
+                    })], style={"height": "30vh"}),
             dcc.Graph(id='basic-time-{}'.format(column), figure=time_plot, style={'height': "45vh", "width": "100%"})
         ])

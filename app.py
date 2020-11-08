@@ -198,7 +198,7 @@ def update_output(start_date, end_date, value):
 )
 def content_update(ordering_selection, start_date, end_date):
     if ordering_selection == "severe":
-        return second.severe(column=0,start_date=start_date,end_date=end_date), second.severe_plot(column=1,start_date=start_date,end_date=end_date), second.severe_empty(column=2)
+        return second.severe(column=0,start_date=start_date,end_date=end_date), second.severe_plot(column=1,start_date=start_date,end_date=end_date), second.severe_plot(column=2)
     # elif ordering_selection == "normal":
     #     return second.severe(column=0), second.severe(column=1), second.severe(column=2)
     # elif ordering_selection == "capcity":
