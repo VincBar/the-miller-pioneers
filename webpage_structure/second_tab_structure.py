@@ -121,8 +121,8 @@ def severe_plot(column=1, start_date=date(2020, 7, 11), end_date=date(2021, 7, 1
     animals = ["Construction {}".format(el) for el in tmp["index"]]
 
     fig = go.Figure(data=[
-        go.Bar(name='Original accumulated capacity', x=animals, y=tmp["trains_complete_time"],),
-        go.Bar(name='Left accumulated capacity', x=animals, y=tmp["trains_complete_time"] - tmp["cancelled_trains"])
+        go.Bar(name='Original accumulated capacity', x=animals, y=tmp["trains_complete_time"],marker=dict(color="#238823")),
+        go.Bar(name='Left accumulated capacity', x=animals, y=tmp["trains_complete_time"] - tmp["cancelled_trains"],marker=dict(color='#d2222d'))
     ])
     # Change the bar mode
     fig.update_layout(barmode='group')
@@ -192,7 +192,8 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
                     columns=[{"name": names_2[j], "id": i} for j, i in enumerate(df_conflict.columns)],
                     data=df_conflict.to_dict('records'),
                     style_table={
-                        'overflowX': 'scroll'
+                        'maxHeight': '14vh',
+                        'overflowY': 'scroll'
                     })], style={"height": "30vh"}),
             dcc.Graph(id='basic-time-{}'.format(column), figure=time_plot, style={'height': "45vh", "width": "100%"})
         ])
