@@ -31,35 +31,38 @@ def main_structure():
             dcc.RadioItems(
                 id='ordering-selection',
                 options=[{'label': 'Most severe', 'value': 'severe'},
-                         {'label': 'Highest normal traffic', 'value': 'normal'},
-                         {'label': 'Highest Capacity Reduction', 'value': "capacity"},
-                         {'label': 'Most Days with Reduction', 'value': 'time'},
+                         # {'label': 'Highest normal traffic', 'value': 'normal'},
+                         # {'label': 'Highest Capacity Reduction', 'value': "capacity"},
+                         # {'label': 'Most Days with Reduction', 'value': 'time'},
                          {'label': 'Most Conflicts', 'value': 'conflict'}, ],
                 value='conflict',
                 labelStyle={'display': 'inline-block'},
-                style={"margin-left": "20px", "margin-top": "19px", 'float': 'left'})
+                style={"margin-left": "20px", "margin-top": "23px", 'float': 'left'})
         ],
             style={"margin-left": "10px", "margin-bottom": "10px", "display": "table-row", "width": "100%"})
         ,
         html.Div([html.Div(id="first_column",
                            style={"width": "31%", "height": "99%", "float": "left",
                                   "margin-left": "10px",
+                                  "border": "3px inset grey",
                                   "-webkit-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
                                   "-moz-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
                                   "box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)"}),
                   html.Div(id="second_column",
                            style={"width": "31%", "height": "99%", "float": "left",
                                   "margin-left": "10px",
+                                  "border": "3px inset grey",
                                   "-webkit-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
                                   "-moz-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
                                   "box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)"}),
                   html.Div(id="third_column",
                            style={"width": "31%", "height": "99%", "float": "left",
                                   "margin-left": "10px",
+                                  "border": "3px inset grey",
                                   "-webkit-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
                                   "-moz-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
                                   "box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)"})],
-                 style={"width": "99%", "height": "80vh", "border": "1px solid black"})
+                 style={"width": "99%", "height": "80vh"})
     ])
 
 

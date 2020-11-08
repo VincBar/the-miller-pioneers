@@ -74,7 +74,7 @@ layout = dict(
 )
 
 app.layout = html.Div([
-    dcc.Tabs(id='tabs-example', value='tab-1', children=[
+    dcc.Tabs(id='tabs-example', value='tab-2', children=[
         dcc.Tab(label='Switzerland Overview', value='tab-1'),
         dcc.Tab(label='Trouble Analysis', value='tab-2'),
     ]),
@@ -193,15 +193,14 @@ def update_output(start_date, end_date, value):
      dash.dependencies.Input('date-range-trouble', 'end_date'), ]
 )
 def content_update(ordering_selection, start_date, end_date):
-    print(ordering_selection)
     if ordering_selection == "severe":
         return second.severe(column=0,start_date=start_date,end_date=end_date), second.severe_plot(column=1,start_date=start_date,end_date=end_date), second.severe_empty(column=2)
-    elif ordering_selection == "normal":
-        return second.severe(column=0), second.severe(column=1), second.severe(column=2)
-    elif ordering_selection == "capcity":
-        return second.severe(column=0), second.severe(column=1), second.severe(column=2)
-    elif ordering_selection == "time":
-        return second.severe(column=0), second.severe(column=1), second.severe(column=2)
+    # elif ordering_selection == "normal":
+    #     return second.severe(column=0), second.severe(column=1), second.severe(column=2)
+    # elif ordering_selection == "capcity":
+    #     return second.severe(column=0), second.severe(column=1), second.severe(column=2)
+    # elif ordering_selection == "time":
+    #     return second.severe(column=0), second.severe(column=1), second.severe(column=2)
     elif ordering_selection == "conflict":
         return second.conflict(0, start_date, end_date), second.conflict(1, start_date, end_date), second.conflict(2,
                                                                                                                    start_date,
