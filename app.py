@@ -9,7 +9,7 @@ from data_load.loader import BigLineLoader
 from data_load.utils import line_info
 import plotly.express as px
 import plotly.graph_objects as go
-
+import dash_table
 import pandas as pd
 import numpy as np
 from datetime import date
@@ -95,26 +95,37 @@ def render_content(tab):
 
 @app.callback(
     Output('output-point-click', 'children'),
-    [dash.dependencies.Input('date-range-graphic', 'start_date'),
-     dash.dependencies.Input('date-range-graphic', 'end_date'),
-     Input('basic-map', 'clickData')])
-def display_click_data(start_date, end_date, clickData):
-    troubleLoader.filter_by_time(start_date, end_date)
+    [Input('basic-map', 'clickData')])
+def display_click_data(clickData):
     print("Hi")
-    df = troubleLoader.working_dataset
+    df_1 = troubleLoader.working_dataset.copy(deep=True)
     print("Hi")
 
-    df.loc[:, "date_to"] = pd.DatetimeIndex(df.loc[:, "date_to"]).strftime("%Y-%m-%d")
-    df.loc[:, "date_from"] = pd.DatetimeIndex(df.loc[:, "date_from"]).strftime("%Y-%m-%d")
+    df_1.loc[:, "date_to"] = pd.DatetimeIndex(df_1.loc[:, "date_to"]).strftime("%Y-%m-%d")
+    df_1.loc[:, "date_from"] = pd.DatetimeIndex(df_1.loc[:, "date_from"]).strftime("%Y-%m-%d")
     print("Hi")
     print(clickData)
     if clickData is None:
         return json.dumps(clickData, indent=2)
     else:
-        index_list = np.logical_or(df.loc[:, "bp_from"] == clickData["points"][0]["text"],
-                                   df.loc[:, "bp_to"] == clickData["points"][0]["text"])
-        print(df.loc[index_list, :])
-        return json.dumps(clickData, indent=2)
+        index_list = np.logical_or(df_1.loc[:, "bp_from"] == clickData["points"][0]["text"],
+                                   df_1.loc[:, "bp_to"] == clickData["points"][0]["text"])
+        df_new=df_1.loc[index_list, :].transpose()
+        df_new.reset_index(inplace=True)
+        return dash_table.DataTable(
+            id='table',
+            columns=[{"name": i, "id": i} for j, i in enumerate(df_new.columns)],
+            data=df_new.to_dict('records'),
+            style_header={'backgroundColor': 'rgb(30, 30, 30)'},
+            style_cell={
+                'textAlign': 'left',
+                'backgroundColor': 'rgb(50, 50, 50)',
+                'color': 'white'
+            },
+            style_table={
+                'maxHeight': '75vh',
+                'overflowY': 'scroll'
+            })
 
 
 #
