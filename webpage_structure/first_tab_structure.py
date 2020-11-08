@@ -15,40 +15,6 @@ from data_load.loader import BigLineLoader
 from data_load.loader import LineLoader, ConstructionSiteLoader
 from data_load.trouble_management import TroubleManager
 
-d = BigLineLoader().set_sort_km().load()
-d = d.rename(columns={'latitude': 'lat', 'longitude': 'lon'})
-d['line_group'] = d['linie']
-d['color'] = ['green'] * len(d)
-print(d)
-
-fig = px.line_mapbox(d, lat="lat", lon="lon", hover_name="bezeichnung_bps", hover_data=["linienname", "linie"],
-                     line_group='line_group', color='color')
-fig.update_layout(
-    mapbox_zoom=6,  # hardcoded values for center of switzerland, can be adjusted automagically when we have the data
-    mapbox_center_lat=46.87,
-    mapbox_center_lon=8.13,
-    mapbox_style="white-bg",
-    mapbox_layers=[
-        {
-            "below": 'traces',
-            "sourcetype": "raster",
-            "source": [
-                "http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
-            ]
-        }
-    ])
-fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
-
-'''
-for i, line in enumerate(line_info(d)):
-    line_dict = dict(mode="markers+lines",
-                     lon=line['lon'],
-                     lat=line['lat'],
-                     marker={'size': 10})
-    if len(line['lon']) > 2:
-        fig.add_trace(**line_dict) #go.Scattermapbox(**line_dict))
-'''
-
 line_data = LineLoader().load()
 construction_data = ConstructionSiteLoader().load()
 troubleLoader = TroubleManager(construction_data, line_data)
@@ -80,7 +46,7 @@ def main_structure():
                 style={"margin-left": "20px", "margin-top": "19px", 'float': 'left', "className": "dcc_control"}
             )], style={"margin-left": "10px", "margin-bottom": "10px", "display": "table-row"}),
         html.Div(
-            [html.Div(dcc.Graph(id='basic-map', figure=fig, style={'height': "75vh"}),
+            [html.Div(dcc.Graph(id='basic-map', style={'height': "75vh"}),
                       style={"width": "70%",
                              "height": "99%",
                              "border": "1px solid black",

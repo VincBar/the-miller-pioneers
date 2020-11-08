@@ -6,14 +6,58 @@ from webpage_structure import first_tab_structure as first
 from webpage_structure import second_tab_structure as second
 
 from data_load.loader import BigLineLoader
+from data_load.utils import line_info
 import plotly.express as px
+import plotly.graph_objects as go
+
 
 import pandas as pd
 import numpy as np
 from datetime import date
 from webpage_structure.first_tab_structure import troubleLoader
+from data_load.line_operating_points import filter_small_lines
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+# load map data
+map_data = BigLineLoader().set_sort_km().load()
+map_data = filter_small_lines(map_data)
+all_lines, abbr_dict = line_info(map_data)
+
+map_layout = dict(
+    margin={"r": 0, "t": 0, "l": 0, "b": 0},
+    mapbox_zoom=6,
+    mapbox_center_lat=46.87,
+    mapbox_center_lon=8.13,
+    mapbox_style="white-bg",
+    mapbox_layers=[
+        {
+            "below": 'traces',
+            "sourcetype": "raster",
+            "source": [
+                'https://tile.osm.ch/switzerland/{z}/{x}/{y}.png'#"http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+            ]
+        }
+    ])
+# draw normal lines
+drawn_lines = 0
+for i, (k, line) in enumerate(all_lines.items()):
+    line_dict = dict(mode="markers+lines",
+                     name=str(line['line_number']),
+                     # legendgroup='Lines',
+                     opacity=0.5,
+                     lon=line['lon'],
+                     lat=line['lat'],
+                     text=line['stop_name'],
+                     # hoverinfo=line['stop_name'],
+                     marker={'size': 5, 'color': 'green'},
+                     line={'color': "green"})
+    if i == 0:
+        fig = go.Figure(go.Scattermapbox(**line_dict))
+    if line['n_stop'] > 8:
+        drawn_lines += 1
+        fig.add_trace(go.Scattermapbox(**line_dict))
+fig.update_layout(**map_layout)
 
 app = dash.Dash(__name__)
 server = app.server
@@ -82,33 +126,28 @@ def update_output(start_date, end_date, value):
     df.loc[:, "date_to"] = pd.DatetimeIndex(df.loc[:, "date_to"]).strftime("%Y-%m-%d")
     df.loc[:, "date_from"] = pd.DatetimeIndex(df.loc[:, "date_from"]).strftime("%Y-%m-%d")
 
-    # TODO: do not create from scratch
-    issues = df['bp_to'].to_list() + df['bp_from'].to_list()
+    fig.data = fig.data[:drawn_lines]
 
-    d = BigLineLoader().set_sort_km().load()
-    d = d.rename(columns={'latitude': 'lat', 'longitude': 'lon'})
-    d['line_group'] = d['linie']
-    d['color'] = ['green'] * len(d)
-    d.loc[d['abkurzung_bpk'].isin(issues), 'color'] = 'red'
+    for index, issue in df.iterrows():
+        if issue['reduction_capacity'] >= 0.5:
+            color = 'red'
+        else:
+            color = 'yellow'
 
-    fig = px.line_mapbox(d, lat="lat", lon="lon", hover_name="bezeichnung_bps", hover_data=["linienname", "linie"],
-                         line_group='line_group', color='color')
-    fig.update_layout(
-        mapbox_zoom=6,
-        # hardcoded values for center of switzerland, can be adjusted automagically when we have the data
-        mapbox_center_lat=46.87,
-        mapbox_center_lon=8.13,
-        mapbox_style="white-bg",
-        mapbox_layers=[
-            {
-                "below": 'traces',
-                "sourcetype": "raster",
-                "source": [
-                    "http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
-                ]
-            }
-        ])
-    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+        try:
+            line_dict = dict(mode="markers+lines",
+                             name=issue['bp_from'] + '-' + issue['bp_to'],
+                             # legendgroup='Construction',
+                             text=[issue['bp_from'], issue['bp_to']],
+                             # hoverinfo=[issue['date_from'] + '-' + issue['date_to']],
+                             lon=[abbr_dict[issue['bp_from']]['lon'], abbr_dict[issue['bp_to']]['lon']],
+                             lat=[abbr_dict[issue['bp_from']]['lat'], abbr_dict[issue['bp_to']]['lat']],
+                             marker={'size': 10, 'color': color},
+                             line={'color': color})
+            fig.add_trace(go.Scattermapbox(**line_dict))
+        except:
+            print('unsuccessful: could not find abbreviation')
+
     # find stops that appear in bp_to or bp_from
     # paint red
 
