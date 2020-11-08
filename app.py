@@ -189,26 +189,41 @@ def update_output(start_date, end_date, value):
 
 
 @app.callback(
-    [dash.dependencies.Output('first_column', 'children'),
-     dash.dependencies.Output('second_column', 'children'),
-     dash.dependencies.Output('third_column', 'children')],
+    dash.dependencies.Output('content_block', 'children'),
     [dash.dependencies.Input('ordering-selection', 'value'),
      dash.dependencies.Input('date-range-trouble', 'start_date'),
      dash.dependencies.Input('date-range-trouble', 'end_date'), ]
 )
 def content_update(ordering_selection, start_date, end_date):
+    style_dict={"width": "31%", "float": "left",
+                     "margin-left": "10px",
+                     "border": "3px inset grey",
+                     "-webkit-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
+                     "-moz-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
+                     "box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)"}
+
     if ordering_selection == "severe":
-        return second.severe(column=0,start_date=start_date,end_date=end_date), second.severe_plot(column=1,start_date=start_date,end_date=end_date), second.severe_plot(column=2)
-    # elif ordering_selection == "normal":
-    #     return second.severe(column=0), second.severe(column=1), second.severe(column=2)
-    # elif ordering_selection == "capcity":
-    #     return second.severe(column=0), second.severe(column=1), second.severe(column=2)
-    # elif ordering_selection == "time":
-    #     return second.severe(column=0), second.severe(column=1), second.severe(column=2)
+        style_dict_1=style_dict.copy()
+        style_dict_1["width"]="70%"
+        style_dict_1["height"]="70vh"
+        style_dict_2=style_dict.copy()
+        style_dict_2["width"]="27%"
+        style_dict_2["height"]="70vh"
+
+        return html.Div([html.Div([second.severe(column=0,start_date=start_date,end_date=end_date)],
+                                       id="first_column",
+                                       style=style_dict_1),
+                         html.Div([second.severe_plot(column=1,start_date=start_date,end_date=end_date)],id="second_column",style=style_dict_2)])
     elif ordering_selection == "conflict":
-        return second.conflict(0, start_date, end_date), second.conflict(1, start_date, end_date), second.conflict(2,
-                                                                                                                   start_date,
-                                                                                                                   end_date)
+        return html.Div([html.Div(second.conflict(column=0, start_date=start_date, end_date=end_date),
+                           id="first_column",
+                           style=style_dict),
+                  html.Div(second.conflict(column=1, start_date=start_date, end_date=end_date), id="second_column",
+                           style=style_dict),
+                         html.Div(second.conflict(column=2, start_date=start_date, end_date=end_date),
+                                  id="third_column",
+                                  style=style_dict)
+                         ])
     else:
         print("hi")
 

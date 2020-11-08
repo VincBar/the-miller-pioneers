@@ -41,28 +41,8 @@ def main_structure():
         ],
             style={"margin-left": "10px", "margin-bottom": "10px", "display": "table-row", "width": "100%"})
         ,
-        html.Div([html.Div(id="first_column",
-                           style={"width": "31%", "height": "99%", "float": "left",
-                                  "margin-left": "10px",
-                                  "border": "3px inset grey",
-                                  "-webkit-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
-                                  "-moz-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
-                                  "box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)"}),
-                  html.Div(id="second_column",
-                           style={"width": "31%", "height": "99%", "float": "left",
-                                  "margin-left": "10px",
-                                  "border": "3px inset grey",
-                                  "-webkit-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
-                                  "-moz-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
-                                  "box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)"}),
-                  html.Div(id="third_column",
-                           style={"width": "31%", "height": "99%", "float": "left",
-                                  "margin-left": "10px",
-                                  "border": "3px inset grey",
-                                  "-webkit-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
-                                  "-moz-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
-                                  "box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)"})],
-                 style={"width": "99%", "height": "80vh"})
+        html.Div(id="content_block",
+                 style={"height": "100vh"})
     ])
 
 
@@ -92,9 +72,12 @@ def severe(column=0, start_date=date(2020, 7, 11), end_date=date(2021, 7, 11)):
     # some getting df stuff.
 
     tmp = most_severe(start_date, end_date)
+    tmp.loc[:, "date_to"] = pd.DatetimeIndex(tmp.loc[:, "date_to"]).strftime("%Y-%m-%d")
+    tmp.loc[:, "date_from"] = pd.DatetimeIndex(tmp.loc[:, "date_from"]).strftime("%Y-%m-%d")
 
-    tmp = tmp.loc[:, ["umsetzung_intervalltyp_umleitung", "reduction_capacity", "num_trains", "cancelled_trains"]]
-    names = ["Index", "Construction", "Red. Capacity", "Usual Trains", "Red. Train Capacity"]
+    print(tmp.columns)
+    tmp = tmp.loc[:, ["umsetzung_intervalltyp_umleitung","strecke","region","bp_from", "date_from","date_to","reduction_capacity", "num_trains", "cancelled_trains",]]
+    names = ["Index", "Construction","Line","Region","Start Point","Time Start","Time End","Red. Capacity", "Usual Trains", "Red. Train Capacity"]
     tmp.reset_index(inplace=True)
     tmp = tmp.round(2)
     return html.Div([
@@ -128,7 +111,7 @@ def severe_plot(column=1, start_date=date(2020, 7, 11), end_date=date(2021, 7, 1
     fig.update_layout(barmode='group')
     if column == 1:
         return html.Div([
-            html.H6("Reduction on Train Numbers top 1-5"),
+            html.H6("Reduction on Train Numbers"),
             dcc.Graph(id='reduction-bar-low-{}'.format(column), figure=fig, style={'height': "50vh", "width": "100%"})]
             , style={"margin-top": "20px"})
     else:
@@ -149,15 +132,15 @@ def reformat_datetime(df, columns_relevant):
     return df.loc[:, columns_relevant]
 
 
-def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11)):
-    if len(troubleLoader.get_conflicts_in_timeframe(start_time, end_time)) <= column:
+def conflict(column=0, start_date=date(2020, 7, 11), end_date=date(2025, 7, 11)):
+    if len(troubleLoader.get_conflicts_in_timeframe(start_date, end_date)) <= column:
         return html.Div([html.H6("No more unscheduled conflicts", style={"text-align": "centre"})])
     else:
         df_in = pd.DataFrame(
-            troubleLoader.get_conflicts_in_timeframe(start_time, end_time)[-(column + 1)][0]).transpose()
+            troubleLoader.get_conflicts_in_timeframe(start_date, end_date)[-(column + 1)][0]).transpose()
         df_in.reset_index(inplace=True)
         df_conflict = pd.DataFrame(
-            troubleLoader.get_conflicts_in_timeframe(start_time, end_time)[-(column + 1)][1])
+            troubleLoader.get_conflicts_in_timeframe(start_date, end_date)[-(column + 1)][1])
         df_conflict.reset_index(inplace=True)
         df_in = reformat_datetime(df_in, ["index", "reduction_capacity", "date_from", "date_to"])
         df_conflict = reformat_datetime(df_conflict,
