@@ -155,7 +155,8 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
 
         names_2 = ["Identifier", "Umsetzung", "Red. Capacity", "Building from", "Building till"]
 
-        time_plot = px.timeline(df, x_start="date_from", x_end="date_to", y="index", color="reduction_capacity")
+        time_plot = px.timeline(df, x_start="date_from", x_end="date_to", y="index", color="reduction_capacity",
+                                color_continuous_scale=px.colors.sequential.YlOrRd)
         time_plot.update_yaxes(autorange="reversed")
         time_plot.update_layout(xaxis=dict(tickformat="%Y-%m"))
         # otherwise tasks are listed from the bottom up
