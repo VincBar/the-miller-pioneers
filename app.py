@@ -70,9 +70,11 @@ def update_output(start_date, end_date, value):
     [dash.dependencies.Output('first_column', 'children'),
      dash.dependencies.Output('second_column', 'children'),
      dash.dependencies.Output('third_column', 'children')],
-    [dash.dependencies.Input('ordering-selection', 'value')]
+    [dash.dependencies.Input('ordering-selection', 'value'),
+     dash.dependencies.Input('date-range-trouble', 'start_date'),
+     dash.dependencies.Input('date-range-trouble', 'end_date'),]
 )
-def content_update(ordering_selection):
+def content_update(ordering_selection,start_date,end_date):
     print(ordering_selection)
     if ordering_selection == "severe":
         return second.severe(column=0), second.severe(column=1), second.severe(column=2)
@@ -83,7 +85,7 @@ def content_update(ordering_selection):
     elif ordering_selection == "time":
         return second.severe(column=0), second.severe(column=1), second.severe(column=2)
     elif ordering_selection == "conflict":
-        return second.conflict(column=0), second.conflict(column=1), second.conflict(column=2)
+        return second.conflict(0,start_date,end_date), second.conflict(1,start_date,end_date), second.conflict(2,start_date,end_date)
     else:
         print("hi")
 
