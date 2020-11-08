@@ -107,7 +107,7 @@ def display_click_data(clickData, start_date,end_date):
     df_1.loc[:, "date_from"] = pd.DatetimeIndex(df_1.loc[:, "date_from"]).strftime("%Y-%m-%d")
 
     if clickData is None:
-        return 'Click on a disturbance.'
+        return 'No disturbance selected.'
     else:
         index_list = np.logical_or(df_1.loc[:, "bp_from"] == clickData["points"][0]["text"],
                                    df_1.loc[:, "bp_to"] == clickData["points"][0]["text"])
@@ -124,6 +124,9 @@ def display_click_data(clickData, start_date,end_date):
                 'color': 'white'
             },
             style_table={
+                'margin-left': '6px',
+                'margin-right': '6px',
+                'margin-bottom': '6px',
                 'maxHeight': '75vh',
                 'overflowY': 'scroll'
             })

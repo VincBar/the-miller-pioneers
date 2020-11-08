@@ -57,7 +57,8 @@ def main_structure():
                              "box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)"},
                       className="one-third column",
                       ),
-             html.Div([html.Div(id='output-container-date-picker-range'),
+             html.Div([html.Div([html.P('Disturbances in the selected period:')]),
+                       html.Div(id='output-container-date-picker-range'),
                        html.Div(dash_table.DataTable(
                            id='table',
                            columns=[{"name": names[j], "id": i} for j, i in enumerate(df.columns)],
@@ -75,6 +76,7 @@ def main_structure():
                                'margin-right': '6px',
                                'margin-bottom': '6px'
                            })),
+                       html.Div([html.P('Click on a disturbance to get more info.')]),
                        html.Div(id='output-point-click')
 
                        ],
