@@ -96,16 +96,17 @@ def render_content(tab):
 
 @app.callback(
     Output('output-point-click', 'children'),
-    [Input('basic-map', 'clickData')])
-def display_click_data(clickData):
-    print("Hi")
-    df_1 = troubleLoader.working_dataset.copy(deep=True)
-    print("Hi")
+    [Input('basic-map', 'clickData'),
+     dash.dependencies.Input('date-range-graphic', 'start_date'),
+     dash.dependencies.Input('date-range-graphic', 'end_date'),
+     ])
+def display_click_data(clickData, start_date,end_date):
+    troubleLoader.filter_by_time(start_date, end_date)
+    df_1 = troubleLoader.working_dataset
 
     df_1.loc[:, "date_to"] = pd.DatetimeIndex(df_1.loc[:, "date_to"]).strftime("%Y-%m-%d")
     df_1.loc[:, "date_from"] = pd.DatetimeIndex(df_1.loc[:, "date_from"]).strftime("%Y-%m-%d")
-    print("Hi")
-    print(clickData)
+
     if clickData is None:
         return json.dumps(clickData, indent=2)
     else:
@@ -114,7 +115,7 @@ def display_click_data(clickData):
         df_new=df_1.loc[index_list, :].transpose()
         df_new.reset_index(inplace=True)
         return dash_table.DataTable(
-            id='table',
+            id='table_new',
             columns=[{"name": i, "id": i} for j, i in enumerate(df_new.columns)],
             data=df_new.to_dict('records'),
             style_header={'backgroundColor': 'rgb(30, 30, 30)'},
@@ -194,7 +195,7 @@ def update_output(start_date, end_date, value):
 def content_update(ordering_selection, start_date, end_date):
     print(ordering_selection)
     if ordering_selection == "severe":
-        return second.severe(column=0), second.severe(column=1), second.severe(column=2)
+        return second.severe(column=0,start_date=start_date,end_date=end_date), second.severe_plot(column=1,start_date=start_date,end_date=end_date), second.severe_empty(column=2)
     elif ordering_selection == "normal":
         return second.severe(column=0), second.severe(column=1), second.severe(column=2)
     elif ordering_selection == "capcity":

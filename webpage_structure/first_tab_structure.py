@@ -58,7 +58,7 @@ def main_structure():
                       className="one-third column",
                       ),
              html.Div([html.Div(id='output-container-date-picker-range'),
-                       dash_table.DataTable(
+                       html.Div(dash_table.DataTable(
                            id='table',
                            columns=[{"name": names[j], "id": i} for j, i in enumerate(df.columns)],
                            data=df.to_dict('records'),
@@ -74,7 +74,7 @@ def main_structure():
                                'margin-left': '6px',
                                'margin-right': '6px',
                                'margin-bottom': '6px'
-                           }),
+                           })),
                        html.Div(id='output-point-click')
 
                        ],

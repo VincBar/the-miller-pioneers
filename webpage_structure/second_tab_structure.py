@@ -6,6 +6,14 @@ import pandas as pd
 from webpage_structure.first_tab_structure import troubleLoader
 import plotly.express as px
 import numpy as np
+from data_load.loader import ConstructionSiteLoader, RoutesLoader
+from data_load.trouble_management import TroubleManager
+import plotly.graph_objects as go
+
+d1 = ConstructionSiteLoader().load()
+routes = RoutesLoader().load()
+
+t = TroubleManager(d1, routes)
 
 
 def main_structure():
@@ -55,22 +63,66 @@ def main_structure():
     ])
 
 
-def severe(column=0):
-    # some getting df stuff.
-    df = pd.DataFrame(np.ones((6, 2)), index=["Usual Number of Trains",
-                                              "Usual Freight Capacity",
-                                              "Reduced Train Capacity",
-                                              "Reduced Freight Capacity",
-                                              "Difference in Trains",
-                                              "Difference in Freight"])
-    df.reset_index(inplace=True)
+def most_severe(start_time, end_time):
+    t.filter_by_time(start_time, end_time)
+    constr = t.working_dataset
 
+    # find where bp_from in constr set matches routes bp_from
+    routes_constr = pd.merge(routes, constr, on="bp_from")
+    routes_constr = routes_constr.rename(columns={"bp_to_x": "bp_to_line", "bp_to_y": "bp_to_constr"})
+    routes_constr["cancelled_trains"] = routes_constr["num_trains"] * routes_constr["reduction_capacity"]
+
+    routes_constr["cancelled_trains"] = routes_constr["cancelled_trains"] * (
+            routes_constr["date_to"] - routes_constr["date_from"]).apply(lambda x: x.days) / 365
+    routes_constr["trains_complete_time"] = routes_constr["num_trains"]* (
+            routes_constr["date_to"] - routes_constr["date_from"]).apply(lambda x: x.days) / 365
+    routes_constr.sort_values("cancelled_trains", ascending=False, inplace=True)
+    five_most_critical = routes_constr.iloc[0:5, :]
+
+    return five_most_critical
+
+
+from datetime import date
+
+
+def severe(column=0,start_date = date(2020, 7, 11),end_date=date(2021, 7, 11)):
+    # some getting df stuff.
+
+    tmp = most_severe(start_date, end_date)
+
+    tmp = tmp.loc[:, ["umsetzung_intervalltyp_umleitung","reduction_capacity","num_trains",   "cancelled_trains"]]
+    names = ["Index","Construction", "Red. Capacity", "Usual Trains",  "Red. Train Capacity"]
+    tmp.reset_index(inplace=True)
+    tmp=tmp.round(0)
     return html.Div([
         dash_table.DataTable(
             id='table_focus_{}'.format(column),
-            columns=[{"name": i, "id": i} for i in df.columns],
-            data=df.to_dict('records'))
+            columns=[{"name": names[j], "id": i} for j, i in enumerate(tmp.columns)],
+            data=tmp.to_dict('records'),
+            style_table={
+                'overflowY': 'scroll'
+            }
+        )
+    ],style={"margin-top":"20px"})
+
+def severe_plot(column=1,start_date = date(2020, 7, 11),end_date=date(2021, 7, 11)):
+    # some getting df stuff.
+    start_time = date(2020, 7, 11)
+    end_time = date(2021, 7, 11)
+    tmp = most_severe(start_time, end_time)
+    tmp.reset_index(inplace=True)
+    animals = ["Construction {}".format(el) for el in tmp["index"]]
+
+    fig = go.Figure(data=[
+        go.Bar(name='Original capacity', x=animals, y=tmp["trains_complete_time"]),
+        go.Bar(name='Left capacity', x=animals, y=tmp["trains_complete_time"]-tmp["cancelled_trains"])
     ])
+    # Change the bar mode
+    fig.update_layout(barmode='group')
+    return dcc.Graph(id='reduction-bar-{}'.format(column), figure=fig, style={'height': "50vh", "width": "100%"})
+
+def severe_empty(column=1,start_date = date(2020, 7, 11),end_date=date(2021, 7, 11)):
+    return html.Div()
 
 
 def reformat_datetime(df, columns_relevant):
@@ -82,7 +134,7 @@ def reformat_datetime(df, columns_relevant):
 
 def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11)):
     if len(troubleLoader.get_conflicts_in_timeframe(start_time, end_time)) <= column:
-        return html.Div([html.H6("No more unscheduled conflicts",style={"text-align":"centre"})])
+        return html.Div([html.H6("No more unscheduled conflicts", style={"text-align": "centre"})])
     else:
         df_in = pd.DataFrame(
             troubleLoader.get_conflicts_in_timeframe(start_time, end_time)[-(column + 1)][0]).transpose()
@@ -105,7 +157,7 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
         time_plot.update_layout(xaxis=dict(tickformat="%Y-%m"))
         # otherwise tasks are listed from the bottom up
         return html.Div([
-            html.H6("Implementation not planned yet", style={"text-align":"centre"}),
+            html.H6("Implementation not planned yet", style={"text-align": "centre"}),
             dash_table.DataTable(
                 id='table_in_{}'.format(column),
                 columns=[{"name": names_1[j], "id": i} for j, i in enumerate(df_in.columns)],
@@ -114,7 +166,7 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
                     'overflowY': 'scroll'
                 }
             ),
-            html.H6("Conflicts to keep in mind", style={"text-align":"centre"}),
+            html.H6("Conflicts to keep in mind", style={"text-align": "centre"}),
             dash_table.DataTable(
                 id='table_focus_{}'.format(column),
                 columns=[{"name": names_2[j], "id": i} for j, i in enumerate(df_conflict.columns)],
