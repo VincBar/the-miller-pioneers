@@ -4,6 +4,10 @@ import dash_html_components as html
 from dash.dependencies import Input, Output
 from webpage_structure import first_tab_structure as first
 from webpage_structure import second_tab_structure as second
+
+from data_load.loader import BigLineLoader
+import plotly.express as px
+
 import pandas as pd
 import numpy as np
 from datetime import date
@@ -41,7 +45,8 @@ def display_click_data(clickData):
 
 #
 @app.callback(
-    dash.dependencies.Output('table', 'data'),
+    [dash.dependencies.Output('table', 'data'),
+     dash.dependencies.Output('basic-map', 'figure'),],
     [dash.dependencies.Input('date-range-graphic', 'start_date'),
      dash.dependencies.Input('date-range-graphic', 'end_date'),
      dash.dependencies.Input('day-night-select', 'value')])
@@ -63,7 +68,38 @@ def update_output(start_date, end_date, value):
 
     df.loc[:, "date_to"] = pd.DatetimeIndex(df.loc[:, "date_to"]).strftime("%Y-%m-%d")
     df.loc[:, "date_from"] = pd.DatetimeIndex(df.loc[:, "date_from"]).strftime("%Y-%m-%d")
-    return df.to_dict("records")
+
+    # TODO: do not create from scratch
+    issues = df['bp_to'].to_list() + df['bp_from'].to_list()
+
+    d = BigLineLoader().set_sort_km().load()
+    d = d.rename(columns={'latitude': 'lat', 'longitude': 'lon'})
+    d['line_group'] = d['linie']
+    d['color'] = ['green'] * len(d)
+    d.loc[d['abkurzung_bpk'].isin(issues), 'color'] = 'red'
+
+    fig = px.line_mapbox(d, lat="lat", lon="lon", hover_name="bezeichnung_bps", hover_data=["linienname", "linie"],
+                         line_group='line_group', color='color')
+    fig.update_layout(
+        mapbox_zoom=6,
+        # hardcoded values for center of switzerland, can be adjusted automagically when we have the data
+        mapbox_center_lat=46.87,
+        mapbox_center_lon=8.13,
+        mapbox_style="white-bg",
+        mapbox_layers=[
+            {
+                "below": 'traces',
+                "sourcetype": "raster",
+                "source": [
+                    "http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+                ]
+            }
+        ])
+    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+    # find stops that appear in bp_to or bp_from
+    # paint red
+
+    return df.to_dict("records"), fig
 
 
 @app.callback(
