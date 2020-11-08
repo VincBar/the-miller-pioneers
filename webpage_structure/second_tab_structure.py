@@ -34,18 +34,25 @@ def main_structure():
             style={"margin-left": "10px", "margin-bottom": "10px", "display": "table-row", "width": "100%"})
         ,
         html.Div([html.Div(id="first_column",
-                           style={"width": "31%", "height": "99%", "border": "1px solid black", "float": "left",
-                                  "margin-left": "10px"}),
+                           style={"width": "31%", "height": "99%", "float": "left",
+                                  "margin-left": "10px",
+                                  "-webkit-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
+                                  "-moz-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
+                                  "box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)"}),
                   html.Div(id="second_column",
-                           style={"width": "31%", "height": "99%", "border": "1px solid black", "float": "left",
-                                  "margin-left": "10px"}),
+                           style={"width": "31%", "height": "99%", "float": "left",
+                                  "margin-left": "10px",
+                                  "-webkit-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
+                                  "-moz-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
+                                  "box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)"}),
                   html.Div(id="third_column",
-                           style={"width": "31%", "height": "99%", "border": "1px solid black", "float": "left",
-                                  "margin-left": "10px"})],
+                           style={"width": "31%", "height": "99%", "float": "left",
+                                  "margin-left": "10px",
+                                  "-webkit-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
+                                  "-moz-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
+                                  "box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)"})],
                  style={"width": "99%", "height": "80vh", "border": "1px solid black"})
     ])
-
-
 
 
 def severe(column=0):
@@ -74,8 +81,8 @@ def reformat_datetime(df, columns_relevant):
 
 
 def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11)):
-    if len(troubleLoader.get_conflicts_in_timeframe(start_time, end_time))<=column:
-        return html.Div([html.H6("No more unscheduled conflicts")])
+    if len(troubleLoader.get_conflicts_in_timeframe(start_time, end_time)) <= column:
+        return html.Div([html.H6("No more unscheduled conflicts",style={"text-align":"centre"})])
     else:
         df_in = pd.DataFrame(
             troubleLoader.get_conflicts_in_timeframe(start_time, end_time)[-(column + 1)][0]).transpose()
@@ -83,37 +90,37 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
         df_conflict = pd.DataFrame(
             troubleLoader.get_conflicts_in_timeframe(start_time, end_time)[-(column + 1)][1])
         df_conflict.reset_index(inplace=True)
-        df_in = reformat_datetime(df_in, ["index","reduction_capacity", "date_from", "date_to"])
-        df_conflict = reformat_datetime(df_conflict, ["index","umsetzung_intervalltyp_umleitung", "reduction_capacity", "date_from", "date_to"])
-        df = pd.concat([df_in,df_conflict])
-        df.loc[:,"index"]=["Job {}".format(el) for el in df["index"].values]
-        names_1 = ["Identifier","Red. Capacity","Building from", "Building till"]
+        df_in = reformat_datetime(df_in, ["index", "reduction_capacity", "date_from", "date_to"])
+        df_conflict = reformat_datetime(df_conflict,
+                                        ["index", "umsetzung_intervalltyp_umleitung", "reduction_capacity", "date_from",
+                                         "date_to"])
+        df = pd.concat([df_in, df_conflict])
+        df.loc[:, "index"] = ["Job {}".format(el) for el in df["index"].values]
+        names_1 = ["Identifier", "Red. Capacity", "Building from", "Building till"]
 
-        names_2 = ["Identifier","Umsetzung", "Red. Capacity","Building from", "Building till"]
+        names_2 = ["Identifier", "Umsetzung", "Red. Capacity", "Building from", "Building till"]
 
-        time_plot = px.timeline(df, x_start="date_from", x_end="date_to", y="index",color="reduction_capacity")
+        time_plot = px.timeline(df, x_start="date_from", x_end="date_to", y="index", color="reduction_capacity")
         time_plot.update_yaxes(autorange="reversed")
-        time_plot.update_xaxes(autorange="reversed")
         time_plot.update_layout(xaxis=dict(tickformat="%Y-%m"))
         # otherwise tasks are listed from the bottom up
         return html.Div([
-            html.H6("Implementation not planned yet"),
+            html.H6("Implementation not planned yet", style={"text-align":"centre"}),
             dash_table.DataTable(
                 id='table_in_{}'.format(column),
-                columns=[{"name": names_1[j], "id": i} for j,i in enumerate(df_in.columns)],
+                columns=[{"name": names_1[j], "id": i} for j, i in enumerate(df_in.columns)],
                 data=df_in.to_dict('records'),
                 style_table={
                     'overflowY': 'scroll'
                 }
             ),
-            html.H6("Conflicts to keep in mind"),
+            html.H6("Conflicts to keep in mind", style={"text-align":"centre"}),
             dash_table.DataTable(
                 id='table_focus_{}'.format(column),
-                columns=[{"name": names_2[j], "id": i}  for j,i in enumerate(df_conflict.columns)],
+                columns=[{"name": names_2[j], "id": i} for j, i in enumerate(df_conflict.columns)],
                 data=df_conflict.to_dict('records'),
                 style_table={
                     'overflowY': 'scroll'
                 }),
-            dcc.Graph(id='basic-time-{}'.format(column), figure=time_plot, style={'height': "30vh","width":"100%"})
+            dcc.Graph(id='basic-time-{}'.format(column), figure=time_plot, style={'height': "30vh", "width": "100%"})
         ])
-
