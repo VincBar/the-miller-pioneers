@@ -59,13 +59,26 @@ fig.update_layout(**map_layout)
 
 app = dash.Dash(__name__)
 server = app.server
+
+layout = dict(
+    autosize=True,
+    automargin=True,
+    margin=dict(l=30, r=30, b=20, t=40),
+    hovermode="closest",
+    plot_bgcolor="#F9F9F9",
+    paper_bgcolor="#F9F9F9",
+    legend=dict(font=dict(size=10), orientation="h"),
+)
+
 app.layout = html.Div([
     dcc.Tabs(id='tabs-example', value='tab-2', children=[
         dcc.Tab(label='Switzerland Overview', value='tab-1'),
         dcc.Tab(label='Trouble Analysis', value='tab-2'),
     ]),
     html.Div(id='tabs-example-content')
-], style={"height": "95vh", "border": "1px solid black"}
+],
+    id="mainContainer",
+    style={"height": "95vh"},
 )
 
 
@@ -88,7 +101,7 @@ def display_click_data(clickData):
 #
 @app.callback(
     [dash.dependencies.Output('table', 'data'),
-     dash.dependencies.Output('basic-map', 'figure'),],
+     dash.dependencies.Output('basic-map', 'figure'), ],
     [dash.dependencies.Input('date-range-graphic', 'start_date'),
      dash.dependencies.Input('date-range-graphic', 'end_date'),
      dash.dependencies.Input('day-night-select', 'value')])
@@ -98,15 +111,15 @@ def update_output(start_date, end_date, value):
         filter = np.logical_not(np.in1d(troubleLoader.working_dataset.loc[:, 'umsetzung_intervalltyp_umleitung'],
                                         ["Sperre Bahnhof Nacht", "Sperre Strecke Nacht"]))
         df = troubleLoader.working_dataset.loc[
-            filter, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
+            filter, ["bp_to", "bp_from", "reduction_capacity","date_from","date_to"]]
     elif value == 'Night':
         filter = np.logical_not(np.in1d(troubleLoader.working_dataset.loc[:, 'umsetzung_intervalltyp_umleitung'],
                                         ["Sperre Bahnhof Tag", "Sperre Strecke Tag"]))
         df = troubleLoader.working_dataset.loc[
-            filter, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
+            filter, ["bp_to", "bp_from", "reduction_capacity", "date_from","date_to"]]
     else:
         df = troubleLoader.working_dataset.loc[
-             :, ["bp_to", "bp_from", "reduction_capacity", "date_to", "date_from"]]
+             :, ["bp_to", "bp_from", "reduction_capacity", "date_from","date_to"]]
 
     df.loc[:, "date_to"] = pd.DatetimeIndex(df.loc[:, "date_to"]).strftime("%Y-%m-%d")
     df.loc[:, "date_from"] = pd.DatetimeIndex(df.loc[:, "date_from"]).strftime("%Y-%m-%d")
@@ -131,7 +144,7 @@ def update_output(start_date, end_date, value):
                              line={'color': color})
             fig.add_trace(go.Scattermapbox(**line_dict))
         except:
-            print('unsuccessful')
+            print('unsuccessful: could not find abbreviation')
 
     # find stops that appear in bp_to or bp_from
     # paint red
@@ -143,9 +156,11 @@ def update_output(start_date, end_date, value):
     [dash.dependencies.Output('first_column', 'children'),
      dash.dependencies.Output('second_column', 'children'),
      dash.dependencies.Output('third_column', 'children')],
-    [dash.dependencies.Input('ordering-selection', 'value')]
+    [dash.dependencies.Input('ordering-selection', 'value'),
+     dash.dependencies.Input('date-range-trouble', 'start_date'),
+     dash.dependencies.Input('date-range-trouble', 'end_date'), ]
 )
-def content_update(ordering_selection):
+def content_update(ordering_selection, start_date, end_date):
     print(ordering_selection)
     if ordering_selection == "severe":
         return second.severe(column=0), second.severe(column=1), second.severe(column=2)
@@ -156,9 +171,12 @@ def content_update(ordering_selection):
     elif ordering_selection == "time":
         return second.severe(column=0), second.severe(column=1), second.severe(column=2)
     elif ordering_selection == "conflict":
-        return second.conflict(column=0), second.conflict(column=1), second.conflict(column=2)
+        return second.conflict(0, start_date, end_date), second.conflict(1, start_date, end_date), second.conflict(2,
+                                                                                                                   start_date,
+                                                                                                                   end_date)
     else:
         print("hi")
+
 
 # need vh for now later will scale to the size of the content
 if __name__ == '__main__':

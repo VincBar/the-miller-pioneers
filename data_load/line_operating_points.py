@@ -1,11 +1,10 @@
-import requests
-import pandas as pd
+from data_load.loader import LineLoader
 
 
-def lat_long_from_geopos(geopos):
-    lat = max(geopos[0], geopos[1])
-    lon = min(geopos[0], geopos[1])
-    return lat, lon
+def filter_small_lines(df, km=5):
+    g = df[["linie", "km"]].groupby("linie").max()
+    d_filter = df.loc[df["linie"].isin(g[g > km].dropna().index)]
+    return d_filter
 
 
 def line_info(df):
@@ -18,8 +17,8 @@ def line_info(df):
         one_line = one_line.sort_values(by=['km'])  # sort by distance from starting point
 
         line_dict = {
-            "line_number": one_line.linie[n],
-            "line_name": one_line.linienname[n],
+            "line_number": one_line.linie.iloc[0],
+            "line_name": one_line.linienname.iloc[0],
             "n_stop": one_line.shape[0],
             "lon": one_line['longitude'].to_list(),
             "lat": one_line['longitude'].to_list(),
@@ -34,52 +33,14 @@ def line_info(df):
     return one_line, all_lines
 
 
+if "__name__" == "__main__":
+    loader = LineLoader()
+    loader.set_sort_lines()
+    d = loader.load()
+
+    [blub, blab] = line_info(d)
+
+    #loader.set_n(4).load()
 
 
-class LineLoader:
-    REQUEST_API = "https://data.sbb.ch/api/records/1.0/search/?dataset=linie-mit-betriebspunkten"
-    LOAD_FIELDS = {"linie", "km", 'abkurzung_bpk', 'abkurzung_bps', 'linienname', "bezeichnung_bps"}
-
-    params = {"rows": str(-1), "facet": "linie"}
-
-    @staticmethod
-    def get_data_from_fields(fields):
-        res = {}
-        for k, v in fields:
-            if k == "geopos":
-                res["latitude"], res["longitude"] = lat_long_from_geopos(v)
-            elif k in LineLoader.LOAD_FIELDS:
-                res[k] = v
-
-        return res
-
-    def set_sort_lines(self):
-        self.params["sort"] = "-linie"
-        return self
-
-    def set_n(self, n):
-        self.params["rows"] = str(n)
-        return self
-
-    def filter_line(self, line):
-        self.params["refine.linie"] = str(line)
-        return self
-
-    def load(self):
-        r = requests.get(LineLoader.REQUEST_API, params=self.params)
-        data = r.json()["records"]
-        data_list = [LineLoader.get_data_from_fields(d["fields"].items()) for d in data]
-        return pd.DataFrame(data_list)
-
-
-loader = LineLoader()
-d = loader.set_sort_lines()
-d = loader.load()
-
-[blub, blab] = line_info(d)
-
-#loader.set_n(4).load()
-
-
-print(line_info(d))
-
+    print(line_info(d))
