@@ -17,7 +17,7 @@ from datetime import date
 from webpage_structure.first_tab_structure import troubleLoader
 from data_load.line_operating_points import filter_small_lines
 
-# external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = ['https://codepen.io/chriddyp/pen/dZVMbK.css']
 
 # load map data
 map_data = BigLineLoader().set_sort_km().load()
@@ -38,7 +38,8 @@ map_layout = dict(
                 'https://tile.osm.ch/switzerland/{z}/{x}/{y}.png'#"http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
             ]
         }
-    ])
+    ],
+    showlegend=False)
 # draw normal lines
 drawn_lines = 0
 for i, (k, line) in enumerate(all_lines.items()):
