@@ -18,27 +18,11 @@ from data_load.trouble_management import TroubleManager
 d = BigLineLoader().set_sort_km().load()
 d = d.rename(columns={'latitude': 'lat', 'longitude': 'lon'})
 d['line_group'] = d['linie']
-d['mode'] = ['markers+lines'] * len(d)
+d['color'] = ['green'] * len(d)
 print(d)
 
 fig = px.line_mapbox(d, lat="lat", lon="lon", hover_name="bezeichnung_bps", hover_data=["linienname", "linie"],
-                        line_group='line_group', color='line_group')
-
-'''
-for i, line in enumerate(line_info(d)):
-    line_dict = dict(mode="markers+lines",
-                     lon=line['lon'],
-                     lat=line['lat'],
-                     marker={'size': 10})
-    if len(line['lon']) > 2:
-        fig.add_trace(**line_dict) #go.Scattermapbox(**line_dict))
-'''
-
-line_data = LineLoader().load()
-construction_data = ConstructionSiteLoader().load()
-troubleLoader = TroubleManager(construction_data, line_data)
-
-
+                        line_group='line_group', color='color')
 fig.update_layout(
     mapbox_zoom=6,  # hardcoded values for center of switzerland, can be adjusted automagically when we have the data
     mapbox_center_lat=46.87,
@@ -55,6 +39,20 @@ fig.update_layout(
     ])
 fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
+
+'''
+for i, line in enumerate(line_info(d)):
+    line_dict = dict(mode="markers+lines",
+                     lon=line['lon'],
+                     lat=line['lat'],
+                     marker={'size': 10})
+    if len(line['lon']) > 2:
+        fig.add_trace(**line_dict) #go.Scattermapbox(**line_dict))
+'''
+
+line_data = LineLoader().load()
+construction_data = ConstructionSiteLoader().load()
+troubleLoader = TroubleManager(construction_data, line_data)
 troubleLoader.filter_by_time(date(2020, 7, 11),date(2025,7,11))
 df = troubleLoader.working_dataset.loc[:,["bp_to","bp_from","reduction_capacity","date_to","date_from"]]
 
