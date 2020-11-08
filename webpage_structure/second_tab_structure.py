@@ -174,6 +174,7 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
         df.loc[df['reduction_capacity'].isnull(), 'color'] = '#ffbf00'
         df.loc[df['reduction_capacity'] <= 0.25, 'color'] = '#ffbf00'
         df.loc[df['reduction_capacity'] > 0.25, 'color'] = '#d2222d'
+        df.iloc[0, -1] = '#000000'
         time_plot = px.timeline(df, x_start="date_from", x_end="date_to", y="index", color="color",
                                 color_discrete_map='identity')
         time_plot.update_yaxes(autorange="reversed")
