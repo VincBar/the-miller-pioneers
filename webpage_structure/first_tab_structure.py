@@ -36,20 +36,21 @@ def main_structure():
                 initial_visible_month=date(2020, 7, 11),
                 start_date=date(2020, 7, 11),
                 end_date=date(2021, 7, 11),
-                style={"margin-left": "80px", "margin-top": "15px", "margin-bottom": "4px", 'float': 'left',
+                style={"margin-left": "80px", "margin-top": "15px", "margin-bottom": "15px", 'float': 'left',
                        "className": "dcc_control"}
             ), dcc.RadioItems(
                 id='day-night-select',
-                options=[{'label': i, 'value': i} for i in ['Day', 'Night', 'Complete']],
+                options=[{'label': i, 'value': i} for i in ['Day \t', 'Night \t', '24h \t']],
                 value='Complete',
                 labelStyle={'display': 'inline-block'},
-                style={"margin-left": "20px", "margin-top": "19px", 'float': 'left', "className": "dcc_control"}
+                inputStyle={"margin-left": "20px", "margin-right": "10px"},
+                style={"margin-left": "20px", "margin-top": "23px", 'float': 'left', "className": "dcc_control"}
             )], style={"margin-left": "10px", "margin-bottom": "10px", "display": "table-row"}),
         html.Div(
             [html.Div(dcc.Graph(id='basic-map', style={'height': "75vh"}),
-                      style={"width": "70%",
-                             "height": "99%",
-                             "border": "1px solid black",
+                      style={"width": "67%",
+                             "height": "80vx",
+                             "border": "3px inset grey",
                              "float": "left",
                              "-webkit-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
                              "-moz-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
@@ -69,15 +70,19 @@ def main_structure():
                            },
                            style_table={
                                'maxHeight': '75vh',
-                               'overflowY': 'scroll'
+                               'overflowY': 'scroll',
+                               'margin-left': '6px',
+                               'margin-right': '6px',
+                               'margin-bottom': '6px'
                            }),
                        html.Div(id='output-point-click')
+
                        ],
-                      style={"width": "25%",
-                             "height": "99%",
+                      style={"width": "24%",
+                             "height": "70vx",
                              "border": "1px solid black",
-                             "float": "right",
-                             "margin-right": "2px",
+                             "float": "left",
+                             "margin-left": "20px",
                              "-webkit-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
                              "-moz-box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)",
                              "box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)"})],
