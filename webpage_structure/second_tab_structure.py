@@ -158,8 +158,10 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
         time_plot = px.timeline(df, x_start="date_from", x_end="date_to", y="index", color="reduction_capacity")
         time_plot.update_yaxes(autorange="reversed")
         time_plot.update_layout(xaxis=dict(tickformat="%Y-%m"))
+        time_plot.update_layout(yaxis={"title":""})
         # otherwise tasks are listed from the bottom up
         return html.Div([
+            html.Div([
             html.H6("Implementation not planned yet", style={"text-align": "centre"}),
             dash_table.DataTable(
                 id='table_in_{}'.format(column),
@@ -176,6 +178,6 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
                 data=df_conflict.to_dict('records'),
                 style_table={
                     'overflowY': 'scroll'
-                }),
-            dcc.Graph(id='basic-time-{}'.format(column), figure=time_plot, style={'height': "30vh", "width": "100%"})
+                })],style={"height":"30vh"}),
+            dcc.Graph(id='basic-time-{}'.format(column), figure=time_plot, style={'height': "45vh", "width": "100%"})
         ])
