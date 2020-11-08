@@ -76,3 +76,9 @@ class TroubleManager:
             result.append((construction, conflicts))
         result.sort(key=lambda x: len(x[1]))
         return result
+
+    def get_lines_affected_constructions(self, construction):
+        return self.operation_points_dataset[
+            self.operation_points_dataset["abkurzung_bpk"] == construction["bp_from"]
+            | self.operation_points_dataset["abkurzung_bpk"] == construction["bp_to"]
+        ]["linie"]

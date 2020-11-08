@@ -1,9 +1,9 @@
 from data_load.loader import LineLoader
 
 
-def filter_small_lines(df):
+def filter_small_lines(df, km=5):
     g = df[["linie", "km"]].groupby("linie").max()
-    d_filter = df.loc[df["linie"].isin(g[g > 5].dropna().index)]
+    d_filter = df.loc[df["linie"].isin(g[g > km].dropna().index)]
     return d_filter
 
 
