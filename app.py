@@ -15,11 +15,13 @@ import pandas as pd
 import numpy as np
 from datetime import date
 from webpage_structure.first_tab_structure import troubleLoader
+from data_load.line_operating_points import filter_small_lines
 
 # external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 # load map data
 map_data = BigLineLoader().set_sort_km().load()
+map_data = filter_small_lines(map_data)
 all_lines, abbr_dict = line_info(map_data)
 
 map_layout = dict(
