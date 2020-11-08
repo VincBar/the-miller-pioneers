@@ -75,7 +75,7 @@ layout = dict(
 app.layout = html.Div([
     dcc.Tabs(id='tabs-example', value='tab-2', children=[
         dcc.Tab(label='Switzerland Overview', value='tab-1'),
-        dcc.Tab(label='Trouble Analysis', value='tab-2'),
+        dcc.Tab(label='Conflict Analysis', value='tab-2'),
     ]),
     html.Div(id='tabs-example-content')
 ],
@@ -107,7 +107,7 @@ def display_click_data(clickData, start_date,end_date):
     df_1.loc[:, "date_from"] = pd.DatetimeIndex(df_1.loc[:, "date_from"]).strftime("%Y-%m-%d")
 
     if clickData is None:
-        return json.dumps(clickData, indent=2)
+        return 'Click on a disturbance.'
     else:
         index_list = np.logical_or(df_1.loc[:, "bp_from"] == clickData["points"][0]["text"],
                                    df_1.loc[:, "bp_to"] == clickData["points"][0]["text"])
