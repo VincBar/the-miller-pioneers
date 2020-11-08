@@ -177,7 +177,7 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
         # otherwise tasks are listed from the bottom up
         return html.Div([
             html.Div([
-                html.H6("Implementation not planned yet", style={"text-align": "centre"}),
+                html.H6("Planned Project", style={"text-align": "centre"}),
                 dash_table.DataTable(
                     id='table_in_{}'.format(column),
                     columns=[{"name": names_1[j], "id": i} for j, i in enumerate(df_in.columns)],
@@ -186,7 +186,7 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
                         'overflowX': 'scroll'
                     }
                 ),
-                html.H6("Conflicts to keep in mind", style={"text-align": "centre"}),
+                html.H6("Conflicting Projects", style={"text-align": "centre"}),
                 dash_table.DataTable(
                     id='table_focus_{}'.format(column),
                     columns=[{"name": names_2[j], "id": i} for j, i in enumerate(df_conflict.columns)],
