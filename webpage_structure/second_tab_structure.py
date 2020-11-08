@@ -37,6 +37,7 @@ def main_structure():
                          {'label': 'Most Conflicts', 'value': 'conflict'}, ],
                 value='conflict',
                 labelStyle={'display': 'inline-block'},
+                inputStyle={"margin-left": "20px", "margin-right": "10px"},
                 style={"margin-left": "20px", "margin-top": "23px", 'float': 'left'})
         ],
             style={"margin-left": "10px", "margin-bottom": "10px", "display": "table-row", "width": "100%"})
@@ -122,7 +123,7 @@ def severe_plot(column=1, start_date=date(2020, 7, 11), end_date=date(2021, 7, 1
 
     fig = go.Figure(data=[
         go.Bar(name='Original accumulated capacity', x=animals, y=tmp["trains_complete_time"],),
-        go.Bar(name='Left accumulated capacity', x=animals, y=tmp["trains_complete_time"] - tmp["cancelled_trains"])
+        go.Bar(name='Remaining accumulated capacity', x=animals, y=tmp["trains_complete_time"] - tmp["cancelled_trains"])
     ])
     # Change the bar mode
     fig.update_layout(barmode='group')
@@ -169,8 +170,12 @@ def conflict(column=0, start_time=date(2020, 7, 11), end_time=date(2025, 7, 11))
 
         names_2 = ["Identifier", "Umsetzung", "Red. Capacity", "Building from", "Building till"]
 
-        time_plot = px.timeline(df, x_start="date_from", x_end="date_to", y="index", color="reduction_capacity",
-                                color_continuous_scale=px.colors.sequential.YlOrRd)
+        df['color'] = df['reduction_capacity']
+        df.loc[df['reduction_capacity'].isnull(), 'color'] = '#ffbf00'
+        df.loc[df['reduction_capacity'] <= 0.25, 'color'] = '#ffbf00'
+        df.loc[df['reduction_capacity'] > 0.25, 'color'] = '#d2222d'
+        time_plot = px.timeline(df, x_start="date_from", x_end="date_to", y="index", color="color",
+                                color_discrete_map='identity')
         time_plot.update_yaxes(autorange="reversed")
         time_plot.update_layout(xaxis=dict(tickformat="%Y-%m"))
         time_plot.update_layout(yaxis={"title": ""})

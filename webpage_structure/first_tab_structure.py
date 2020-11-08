@@ -57,7 +57,7 @@ def main_structure():
                              "box-shadow": "4px 4px 2px 0px rgba(50, 50, 50, 0.75)"},
                       className="one-third column",
                       ),
-             html.Div([html.Div([html.P('Disturbances in the selected period:')]),
+             html.Div([html.Div([html.H6('Disturbances in the selected period:')]),
                        html.Div(id='output-container-date-picker-range'),
                        html.Div(dash_table.DataTable(
                            id='table',
