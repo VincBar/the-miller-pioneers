@@ -21,41 +21,41 @@ from webpage_structure.first_tab_structure import troubleLoader
 # load map data
 map_data = BigLineLoader().set_sort_km().load()
 all_lines, abbr_dict = line_info(map_data)
-map_layout = dict(
-        margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        mapbox_zoom=6,
-        mapbox_center_lat=46.87,
-        mapbox_center_lon=8.13,
-        mapbox_style="white-bg",
-        mapbox_layers=[
-            {
-                "below": 'traces',
-                "sourcetype": "raster",
-                "source": [
-                    "http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
-                ]
-            }
-        ])
 
+map_layout = dict(
+    margin={"r": 0, "t": 0, "l": 0, "b": 0},
+    mapbox_zoom=6,
+    mapbox_center_lat=46.87,
+    mapbox_center_lon=8.13,
+    mapbox_style="white-bg",
+    mapbox_layers=[
+        {
+            "below": 'traces',
+            "sourcetype": "raster",
+            "source": [
+                'https://tile.osm.ch/switzerland/{z}/{x}/{y}.png'#"http://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+            ]
+        }
+    ])
 # draw normal lines
 drawn_lines = 0
 for i, (k, line) in enumerate(all_lines.items()):
     line_dict = dict(mode="markers+lines",
+                     name=str(line['line_number']),
+                     # legendgroup='Lines',
+                     opacity=0.5,
                      lon=line['lon'],
                      lat=line['lat'],
+                     text=line['stop_name'],
+                     # hoverinfo=line['stop_name'],
                      marker={'size': 5, 'color': 'green'},
                      line={'color': "green"})
     if i == 0:
         fig = go.Figure(go.Scattermapbox(**line_dict))
-
     if line['n_stop'] > 8:
         drawn_lines += 1
         fig.add_trace(go.Scattermapbox(**line_dict))
-
 fig.update_layout(**map_layout)
-
-
-
 
 app = dash.Dash(__name__)
 server = app.server
@@ -114,15 +114,24 @@ def update_output(start_date, end_date, value):
     fig.data = fig.data[:drawn_lines]
 
     for index, issue in df.iterrows():
+        if issue['reduction_capacity'] >= 0.5:
+            color = 'red'
+        else:
+            color = 'yellow'
+
         try:
             line_dict = dict(mode="markers+lines",
+                             name=issue['bp_from'] + '-' + issue['bp_to'],
+                             # legendgroup='Construction',
+                             text=[issue['bp_from'], issue['bp_to']],
+                             # hoverinfo=[issue['date_from'] + '-' + issue['date_to']],
                              lon=[abbr_dict[issue['bp_from']]['lon'], abbr_dict[issue['bp_to']]['lon']],
                              lat=[abbr_dict[issue['bp_from']]['lat'], abbr_dict[issue['bp_to']]['lat']],
-                             marker={'size': 10, 'color': 'red'},
-                             line={'color': 'red'})
+                             marker={'size': 10, 'color': color},
+                             line={'color': color})
             fig.add_trace(go.Scattermapbox(**line_dict))
         except:
-            print('Unknown station')
+            print('unsuccessful')
 
     # find stops that appear in bp_to or bp_from
     # paint red
