@@ -18,5 +18,7 @@ This will start an application that will run on localhost and can be accessed th
 An overview of the functionality can be seen in the `polyhack_presentation.pdf`
 
 ![alt text](https://github.com/VincBar/the-miller-pioneers/blob/master/images/SBB_Bottleneck_1.png)
-![alt text](https://github.com/VincBar/the-miller-pioneers/blob/master/images/SBB_Bottleneck_2.png)
+
+![alt text](https://github.com/VincBar/the-miller-pioneers/blob/master/images/SBB_Bottelneck_2.png)
+
 ![alt text](https://github.com/VincBar/the-miller-pioneers/blob/master/images/SBB_Bottleneck_3.png)
