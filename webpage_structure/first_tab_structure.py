@@ -1,17 +1,8 @@
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
 
-from urllib.request import urlopen
-
-import json
-import pandas as pd
-import plotly.express as px
 from datetime import date
-import dash_table
-import numpy as np
-import plotly.graph_objects as go
-from data_load.utils import line_info
-from data_load.loader import BigLineLoader
+from dash import dash_table
 from data_load.loader import LineLoader, ConstructionSiteLoader
 from data_load.trouble_management import TroubleManager
 

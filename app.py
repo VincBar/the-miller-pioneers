@@ -1,18 +1,16 @@
 import dash, json
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
+from dash import dash_table
 from dash.dependencies import Input, Output
 from webpage_structure import first_tab_structure as first
 from webpage_structure import second_tab_structure as second
 
 from data_load.loader import BigLineLoader
 from data_load.utils import line_info
-import plotly.express as px
 import plotly.graph_objects as go
-import dash_table
 import pandas as pd
 import numpy as np
-from datetime import date
 from webpage_structure.first_tab_structure import troubleLoader
 from data_load.line_operating_points import filter_small_lines
 
@@ -103,8 +101,8 @@ def display_click_data(clickData, start_date,end_date):
     troubleLoader.filter_by_time(start_date, end_date)
     df_1 = troubleLoader.working_dataset
 
-    df_1.loc[:, "date_to"] = pd.DatetimeIndex(df_1.loc[:, "date_to"]).strftime("%Y-%m-%d")
-    df_1.loc[:, "date_from"] = pd.DatetimeIndex(df_1.loc[:, "date_from"]).strftime("%Y-%m-%d")
+    df_1.loc[:, "date_to"] = pd.DatetimeIndex(df_1.loc[:, "date_to"]).strftime("%Y-%m-%d").values
+    df_1.loc[:, "date_from"] = pd.DatetimeIndex(df_1.loc[:, "date_from"]).strftime("%Y-%m-%d").values
 
     if clickData is None:
         return 'No disturbance selected.'

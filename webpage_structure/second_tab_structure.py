@@ -1,11 +1,11 @@
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
+from dash import dash_table
+
 from datetime import date
-import dash_table
 import pandas as pd
 from webpage_structure.first_tab_structure import troubleLoader
 import plotly.express as px
-import numpy as np
 from data_load.loader import ConstructionSiteLoader, RoutesLoader
 from data_load.trouble_management import TroubleManager
 import plotly.graph_objects as go
@@ -76,9 +76,9 @@ def severe(column=0, start_date=date(2020, 7, 11), end_date=date(2021, 7, 11)):
     tmp.loc[:, "date_to"] = pd.DatetimeIndex(tmp.loc[:, "date_to"]).strftime("%Y-%m-%d")
     tmp.loc[:, "date_from"] = pd.DatetimeIndex(tmp.loc[:, "date_from"]).strftime("%Y-%m-%d")
 
-    print(tmp.columns)
-    tmp = tmp.loc[:, ["umsetzung_intervalltyp_umleitung","strecke","region","bp_from", "date_from","date_to","reduction_capacity", "num_trains", "cancelled_trains",]]
-    names = ["Index", "Construction","Line","Region","Start Point","Time Start","Time End","Red. Capacity", "Usual Trains", "Red. Train Capacity"]
+    print("print avilable columns",tmp.columns)
+    tmp = tmp.loc[:, ["umsetzung_intervalltyp_umleitung","region","bp_from", "date_from","date_to","reduction_capacity", "num_trains", "cancelled_trains",]]
+    names = ["Index", "Construction","Region","Start Point","Time Start","Time End","Red. Capacity", "Usual Trains", "Red. Train Capacity"]
     tmp.reset_index(inplace=True)
     tmp = tmp.round(2)
     return html.Div([

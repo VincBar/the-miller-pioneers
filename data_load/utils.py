@@ -13,12 +13,12 @@ def line_info(df):
       "lon": one_line['longitude'].to_list(),
       "lat": one_line['latitude'].to_list(),
       "stop_name": one_line['bezeichnung_bps'].to_list(),
-      "abbr": one_line['abkurzung_bps'].to_list(),
+      "abbr": one_line['abkurzung_bpk'].to_list(),
     }
 
   abbr_dict = {}
   for index, line in df.iterrows():
-    abbr_dict[line.abkurzung_bps] = dict(lon=line.longitude, lat=line.latitude, line_number=line.linie,
+    abbr_dict[line.abkurzung_bpk] = dict(lon=line.longitude, lat=line.latitude, line_number=line.linie,
                                          line_name=line.linienname, stop_name=line.bezeichnung_bps)
 
   return all_lines, abbr_dict
